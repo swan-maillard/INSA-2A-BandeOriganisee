@@ -19,7 +19,7 @@ public class Boid {
     public Boid(Flock flock) {
         position = new Vector2D(Math.random() * GUI.SIMULATION_PANEL_WIDTH, Math.random() * GUI.HEIGHT);
         do {
-            vitesse = new Vector2D(Math.random() * speedMax, Math.random() * speedMax);
+            vitesse = new Vector2D(Math.random() * flock.getSpeedMax(), Math.random() * flock.getSpeedMax());
         } while (vitesse.norm() < MIN_WIDTH);
         forces = new Vector2D();
 
@@ -31,6 +31,10 @@ public class Boid {
     private void findNeighbours() {
     }
 
+    private void computeForces() {
+
+    }
+
     private void applyForces() {
 
     }
@@ -39,11 +43,7 @@ public class Boid {
 
     }
 
-    private void computeForces() {
-
-    }
-
     private double getDistanceTo(Boid boid) {
-        return Vector2D.substract(Boid.position, boid.position).norm();
+        return Vector2D.substract(this.position, boid.position).norm();
     }
 }

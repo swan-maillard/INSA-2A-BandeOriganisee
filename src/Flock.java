@@ -30,7 +30,7 @@ public class Flock {
 	// Ajout de boids au flock
 	public void addBoids(int n){
 		for(int i = 0; i<n ; i++){
-			Boid b = new Boid();
+			Boid b = new Boid(this);
 			boids.add(b);
 		}
 	}
@@ -54,7 +54,7 @@ public class Flock {
 	// Dessin de flock
 	public void drawBoids(Graphics g){
 		for(Boid b : boids){
-			b.drawBoid(g);
+			//b.drawBoid(g);
 		}
 	}
 	
