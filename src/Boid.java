@@ -46,20 +46,4 @@ public class Boid {
     private double getDistanceTo(Boid boid) {
         return Vector2D.substract(Boid.position, boid.position).norm();
     }
-
-    public int getViewRange() {
-        return viewRange;
-    }
-
-    public void setViewRange(int viewRange) {
-        this.viewRange = viewRange;
-    }
-
-    public int getSpeedMax() {
-        return speedMax;
-    }
-
-    public void setSpeedMax(int speedMax) {
-        this.speedMax = speedMax;
-    }
 }
