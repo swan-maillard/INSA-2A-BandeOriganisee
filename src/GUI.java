@@ -1,6 +1,7 @@
 import com.formdev.flatlaf.FlatLightLaf;
 
 import javax.swing.*;
+import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
@@ -14,6 +15,8 @@ public class GUI extends JFrame implements ActionListener, ChangeListener {
     public static int SIMULATION_PANEL_WIDTH;
     public static int CONFIG_PANEL_WIDTH;
     public static int HEIGHT;
+
+    private final int TIMER_DELAY = 50;
 
     private ArrayList<Flock> flocks;
 
@@ -38,6 +41,8 @@ public class GUI extends JFrame implements ActionListener, ChangeListener {
     private JTextField updateNameField;
     private JSpinner updateNumberBoidsField;
     private JComboBox<String> updateColorComboBox;
+
+    Timer timer;
 
     public GUI() {
         try {
@@ -73,13 +78,15 @@ public class GUI extends JFrame implements ActionListener, ChangeListener {
         this.setContentPane(contentPane);
 
         this.setVisible(true);
+
+        runSimulation();
     }
 
     private JPanel simulationPanel() {
         JPanel simulationPanel = new JPanel();
         simulationPanel.setLayout(null);
         simulationPanel.setBounds(0, 0, SIMULATION_PANEL_WIDTH, HEIGHT);
-        simulationPanel.setBackground(Color.BLUE);
+        simulationPanel.setBackground(new Color(174, 204, 234));
 
         return simulationPanel;
     }
@@ -88,6 +95,7 @@ public class GUI extends JFrame implements ActionListener, ChangeListener {
         configPanel = new JPanel();
         configPanel.setLayout(null);
         configPanel.setBounds(SIMULATION_PANEL_WIDTH, 0, CONFIG_PANEL_WIDTH, HEIGHT);
+        configPanel.setBackground(Color.WHITE);
 
         int settingsWidth = CONFIG_PANEL_WIDTH - 40;
 
@@ -133,6 +141,7 @@ public class GUI extends JFrame implements ActionListener, ChangeListener {
         JPanel updateSpeciesPanel = new JPanel();
         updateSpeciesPanel.setLayout(null);
         updateSpeciesPanel.setBounds(0, 150, CONFIG_PANEL_WIDTH, HEIGHT-100);
+        updateSpeciesPanel.setBackground(Color.WHITE);
 
 
         JLabel speciesLabel = new JLabel("Espèce");
@@ -244,6 +253,7 @@ public class GUI extends JFrame implements ActionListener, ChangeListener {
 
         createSpeciesPanel.setLayout(null);
         createSpeciesPanel.setBounds(0, 150, CONFIG_PANEL_WIDTH, HEIGHT-100);
+        createSpeciesPanel.setBackground(Color.WHITE);
 
         JLabel nameLabel = new JLabel("Nom");
         nameLabel.setBounds(20, 0, settingsWidth, 20);
@@ -285,6 +295,7 @@ public class GUI extends JFrame implements ActionListener, ChangeListener {
 
         addBoidPanel.setLayout(null);
         addBoidPanel.setBounds(0, 150, CONFIG_PANEL_WIDTH, HEIGHT);
+        addBoidPanel.setBackground(Color.WHITE);
 
         return addBoidPanel;
     }
@@ -294,6 +305,27 @@ public class GUI extends JFrame implements ActionListener, ChangeListener {
         contentPane.remove(configPanel);
         contentPane.add(configPanel());
         this.setContentPane(contentPane);
+    }
+
+    private void runSimulation() {
+        timer = new Timer(TIMER_DELAY, (ActionEvent e) -> {
+            repaint();
+        });
+
+        timer.start();
+    }
+
+    private void stopSimulation() {
+        if (timer.isRunning())
+            timer.stop();
+    }
+
+    @Override
+    public void paint(Graphics g) {
+        super.paint(g);
+        for (Flock flock : flocks) {
+            flock.drawBoids(g);
+        }
     }
 
     public static void main(String[] args) {

@@ -54,7 +54,7 @@ public class Flock {
 	// Dessin de flock
 	public void drawBoids(Graphics g){
 		for(Boid b : boids){
-			//b.drawBoid(g);
+			b.drawBoid(g);
 		}
 	}
 	

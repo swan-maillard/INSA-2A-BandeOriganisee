@@ -40,8 +40,7 @@ public class Boid {
 
     }
 
-    private void drawBoid(Graphics g) {
-
+    public void drawBoid(Graphics g) {
     }
 
     private double getDistanceTo(Boid boid) {
