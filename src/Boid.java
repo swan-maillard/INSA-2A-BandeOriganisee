@@ -21,6 +21,7 @@ public class Boid {
         do {
             vitesse = new Vector2D(Math.random() * flock.getSpeedMax(), Math.random() * flock.getSpeedMax());
         } while (vitesse.norm() < MIN_WIDTH);
+
         forces = new Vector2D();
 
         trails = new ArrayList<>(MAX_TRAILS);

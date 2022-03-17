@@ -20,11 +20,11 @@ public class Flock {
 		alignementCoeff = 0 ;
 		segregationCoeff = 0;
 		viewRange = 0;
-		speedMax = 1;
+		speedMax = 10;
 		name = n;
-		setColor(c);	
+		color = c;
 		boids = new ArrayList<Boid>();
-		addBoids(q);	
+		addBoids(q);
 	}
 	
 	// Ajout de boids au flock
