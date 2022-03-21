@@ -34,6 +34,10 @@ public class Flock {
 			boids.add(b);
 		}
 	}
+
+	public void addBoidAt(int x, int y) {
+		boids.add(new Boid(this, x, y));
+	}
 	
 	public void removeBoid(Boid b){
 		

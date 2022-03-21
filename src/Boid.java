@@ -17,7 +17,11 @@ public class Boid {
     private Flock flock;
 
     public Boid(Flock flock) {
-        position = new Vector2D(Math.random() * GUI.SIMULATION_PANEL_WIDTH, Math.random() * GUI.HEIGHT);
+        this(flock, Math.random() * GUI.SIMULATION_PANEL_WIDTH, Math.random() * GUI.HEIGHT);
+    }
+
+    public Boid(Flock flock, double x, double y) {
+        position = new Vector2D(x, y);
         do {
             vitesse = new Vector2D(Math.random() * flock.getSpeedMax(), Math.random() * flock.getSpeedMax());
         } while (vitesse.norm() < MIN_WIDTH);
@@ -42,7 +46,7 @@ public class Boid {
 
     public void drawBoid(Graphics g) {
         g.setColor(flock.getColor().getColor());
-        g.fillOval((int)position.x, (int)position.y, 10, 10);
+        g.fillOval((int)position.x - 5, (int)position.y - 5, 10, 10);
     }
 
     private double getDistanceTo(Boid boid) {

@@ -1,4 +1,5 @@
 import com.formdev.flatlaf.FlatLightLaf;
+import jdk.jfr.Event;
 
 import javax.swing.*;
 import javax.swing.Timer;
@@ -7,10 +8,12 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.*;
 import java.util.List;
 
-public class GUI extends JFrame implements ActionListener, ChangeListener {
+public class GUI extends JFrame implements ActionListener, ChangeListener, MouseListener {
 
     public static int SIMULATION_PANEL_WIDTH;
     public static int CONFIG_PANEL_WIDTH;
@@ -38,7 +41,7 @@ public class GUI extends JFrame implements ActionListener, ChangeListener {
 
     private JSpinner updateNumberBoidsField;
     private JComboBox<String> updateColorComboBox;
-
+    private JButton deleteFlockButton;
 
     private JPanel configPanel;
     private int configState;
@@ -55,7 +58,7 @@ public class GUI extends JFrame implements ActionListener, ChangeListener {
 
         flocks = new ArrayList<>();
 
-        configState = 1;
+        configState = 0;
         configCurrentFlockIndex = 0;
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -92,6 +95,7 @@ public class GUI extends JFrame implements ActionListener, ChangeListener {
         simulationPanel.setLayout(null);
         simulationPanel.setBounds(0, 0, SIMULATION_PANEL_WIDTH, HEIGHT);
         simulationPanel.setBackground(new Color(174, 204, 234));
+        simulationPanel.addMouseListener(this);
 
         return simulationPanel;
     }
@@ -113,9 +117,9 @@ public class GUI extends JFrame implements ActionListener, ChangeListener {
         if (flocks.isEmpty()) {
             actionItems.add("Créer une espèce");
         } else if (flocks.size() == 5) {
-            actionItems.addAll(List.of("Modifier une espèce", "Ajouter un individu"));
+            actionItems.addAll(List.of("Modifier une espèce"));
         } else {
-            actionItems.addAll(List.of("Créer une espèce", "Modifier une espèce", "Ajouter un individu"));
+            actionItems.addAll(List.of("Créer une espèce", "Modifier une espèce"));
         }
 
         actionComboBox = new JComboBox<>();
@@ -132,13 +136,51 @@ public class GUI extends JFrame implements ActionListener, ChangeListener {
             case 1:
                 configPanel.add(updateSpeciesPanel());
                 break;
-            case 2:
-                configPanel.add(addBoidPanel());
-                break;
         }
 
-
         return configPanel;
+    }
+
+    private JPanel createSpeciesPanel() {
+        int settingsWidth = CONFIG_PANEL_WIDTH - 40;
+        JPanel createSpeciesPanel = new JPanel();
+
+        createSpeciesPanel.setLayout(null);
+        createSpeciesPanel.setBounds(0, 150, CONFIG_PANEL_WIDTH, HEIGHT-100);
+        createSpeciesPanel.setBackground(Color.WHITE);
+
+        JLabel nameLabel = new JLabel("Nom");
+        nameLabel.setBounds(20, 0, settingsWidth, 20);
+        createSpeciesPanel.add(nameLabel);
+
+        createNameField = new JTextField();
+        createNameField.setBounds(20, 20, settingsWidth, 20);
+        createSpeciesPanel.add(createNameField);
+
+        JLabel numberLabel = new JLabel("Nombre");
+        numberLabel.setBounds(20, 40, (settingsWidth-20)/2, 20);
+        createSpeciesPanel.add(numberLabel);
+
+        createNumberBoidsField = new JSpinner();
+        createNumberBoidsField.setModel(new SpinnerNumberModel(1, 1, 100, 1));
+        createNumberBoidsField.setBounds(20, 60, (settingsWidth-20)/2, 20);
+        createSpeciesPanel.add(createNumberBoidsField);
+
+        JLabel colorLabel = new JLabel("Couleur");
+        colorLabel.setBounds(30 + settingsWidth/2, 40, (settingsWidth-20)/2, 20);
+        createSpeciesPanel.add(colorLabel);
+
+        createColorComboBox = new JComboBox<>();
+        createColorComboBox.setModel(new DefaultComboBoxModel<>(FlockColor.getColors()));
+        createColorComboBox.setBounds(30 + settingsWidth/2, 60, (settingsWidth-20)/2, 20);
+        createSpeciesPanel.add(createColorComboBox);
+
+        createFlockButton = new JButton("Créer l'espèce");
+        createFlockButton.setBounds(20, 100, settingsWidth, 20);
+        createFlockButton.addActionListener(this);
+        createSpeciesPanel.add(createFlockButton);
+
+        return createSpeciesPanel;
     }
 
     private JPanel updateSpeciesPanel() {
@@ -252,60 +294,12 @@ public class GUI extends JFrame implements ActionListener, ChangeListener {
         viewRangeCheckBox.addActionListener(this);
         updateSpeciesPanel.add(viewRangeCheckBox);
 
+        deleteFlockButton = new JButton("Supprimer l'espèce");
+        deleteFlockButton.setBounds(20, 300, settingsWidth, 20);
+        deleteFlockButton.addActionListener(this);
+        updateSpeciesPanel.add(deleteFlockButton);
+
         return updateSpeciesPanel;
-    }
-
-    private JPanel createSpeciesPanel() {
-        int settingsWidth = CONFIG_PANEL_WIDTH - 40;
-        JPanel createSpeciesPanel = new JPanel();
-
-        createSpeciesPanel.setLayout(null);
-        createSpeciesPanel.setBounds(0, 150, CONFIG_PANEL_WIDTH, HEIGHT-100);
-        createSpeciesPanel.setBackground(Color.WHITE);
-
-        JLabel nameLabel = new JLabel("Nom");
-        nameLabel.setBounds(20, 0, settingsWidth, 20);
-        createSpeciesPanel.add(nameLabel);
-
-        createNameField = new JTextField();
-        createNameField.setBounds(20, 20, settingsWidth, 20);
-        createSpeciesPanel.add(createNameField);
-
-        JLabel numberLabel = new JLabel("Nombre");
-        numberLabel.setBounds(20, 40, (settingsWidth-20)/2, 20);
-        createSpeciesPanel.add(numberLabel);
-
-        createNumberBoidsField = new JSpinner();
-        createNumberBoidsField.setModel(new SpinnerNumberModel(1, 1, 100, 1));
-        createNumberBoidsField.setBounds(20, 60, (settingsWidth-20)/2, 20);
-        createSpeciesPanel.add(createNumberBoidsField);
-
-        JLabel colorLabel = new JLabel("Couleur");
-        colorLabel.setBounds(30 + settingsWidth/2, 40, (settingsWidth-20)/2, 20);
-        createSpeciesPanel.add(colorLabel);
-
-        createColorComboBox = new JComboBox<>();
-        createColorComboBox.setModel(new DefaultComboBoxModel<>(FlockColor.getColors()));
-        createColorComboBox.setBounds(30 + settingsWidth/2, 60, (settingsWidth-20)/2, 20);
-        createSpeciesPanel.add(createColorComboBox);
-
-        createFlockButton = new JButton("Créer l'espèce");
-        createFlockButton.setBounds(20, 100, settingsWidth, 20);
-        createFlockButton.addActionListener(this);
-        createSpeciesPanel.add(createFlockButton);
-
-        return createSpeciesPanel;
-    }
-
-    private JPanel addBoidPanel() {
-        JPanel addBoidPanel = new JPanel();
-        int settingsWidth = CONFIG_PANEL_WIDTH - 40;
-
-        addBoidPanel.setLayout(null);
-        addBoidPanel.setBounds(0, 150, CONFIG_PANEL_WIDTH, HEIGHT);
-        addBoidPanel.setBackground(Color.WHITE);
-
-        return addBoidPanel;
     }
 
     private void updateConfigPanel() {
@@ -340,8 +334,7 @@ public class GUI extends JFrame implements ActionListener, ChangeListener {
         new GUI();
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
+    private void doAction(EventObject e) {
         int panel = (flocks.size() < 5 ? configState : configState + 1);
 
         if (e.getSource() == actionComboBox) {
@@ -366,25 +359,58 @@ public class GUI extends JFrame implements ActionListener, ChangeListener {
                 updateConfigPanel();
             } else if (e.getSource() == updateColorComboBox) {
                 currentFlock.setColor(FlockColor.values()[updateColorComboBox.getSelectedIndex()]);
+            } else if (e.getSource() == updateNumberBoidsField) {
+                int nbBoids = (int) updateNumberBoidsField.getValue();
+                if (nbBoids >= 1 && nbBoids <= 100) {
+                    currentFlock.updateBoidNumber(nbBoids);
+                }
+            } else if (e.getSource() == deleteFlockButton) {
+                flocks.remove(currentFlock);
+                configCurrentFlockIndex = 0;
+                configState = (flocks.size() > 0 ? 1 : 0);
+                updateConfigPanel();
+            }
+
+            if (e instanceof MouseEvent) {
+                Point location = ((MouseEvent) e).getPoint();
+                Insets insets = this.getInsets();
+                currentFlock.addBoidAt(location.x + insets.left, location.y + insets.top);
+                updateConfigPanel();
             }
         }
     }
 
     @Override
+    public void actionPerformed(ActionEvent e) {
+        doAction(e);
+    }
+
+    @Override
     public void stateChanged(ChangeEvent e) {
-        int panel = (flocks.size() < 5 ? configState : configState + 1);
+        doAction(e);
+    }
 
-        if (panel == 1) {
-            Flock currentFlock = flocks.get(configCurrentFlockIndex);
+    @Override
+    public void mouseClicked(MouseEvent e) {
+    }
 
-            if (e.getSource() == updateNumberBoidsField) {
-                int nbBoids = (int) updateNumberBoidsField.getValue();
-                if (nbBoids >= 1 && nbBoids <= 100) {
-                    System.out.println(nbBoids);
-                    currentFlock.updateBoidNumber(nbBoids);
-                }
-            }
-        }
+    @Override
+    public void mousePressed(MouseEvent e) {
+        doAction(e);
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
 
     }
 }
