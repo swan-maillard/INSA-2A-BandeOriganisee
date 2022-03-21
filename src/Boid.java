@@ -41,6 +41,8 @@ public class Boid {
     }
 
     public void drawBoid(Graphics g) {
+        g.setColor(flock.getColor().getColor());
+        g.fillOval((int)position.x, (int)position.y, 10, 10);
     }
 
     private double getDistanceTo(Boid boid) {

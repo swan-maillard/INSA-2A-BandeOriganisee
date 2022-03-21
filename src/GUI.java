@@ -36,11 +36,13 @@ public class GUI extends JFrame implements ActionListener, ChangeListener {
     private JComboBox<String> createColorComboBox;
     private JButton createFlockButton;
 
-    private JPanel configPanel;
-    private int configState = 0;
-    private JTextField updateNameField;
     private JSpinner updateNumberBoidsField;
     private JComboBox<String> updateColorComboBox;
+
+
+    private JPanel configPanel;
+    private int configState;
+    private int configCurrentFlockIndex;
 
     Timer timer;
 
@@ -52,6 +54,9 @@ public class GUI extends JFrame implements ActionListener, ChangeListener {
         }
 
         flocks = new ArrayList<>();
+
+        configState = 1;
+        configCurrentFlockIndex = 0;
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         SIMULATION_PANEL_WIDTH = (int) (0.75*(screenSize.width-100));
@@ -107,6 +112,8 @@ public class GUI extends JFrame implements ActionListener, ChangeListener {
         ArrayList<String> actionItems = new ArrayList<>();
         if (flocks.isEmpty()) {
             actionItems.add("Créer une espèce");
+        } else if (flocks.size() == 5) {
+            actionItems.addAll(List.of("Modifier une espèce", "Ajouter un individu"));
         } else {
             actionItems.addAll(List.of("Créer une espèce", "Modifier une espèce", "Ajouter un individu"));
         }
@@ -118,7 +125,7 @@ public class GUI extends JFrame implements ActionListener, ChangeListener {
         actionComboBox.addActionListener(this);
         configPanel.add(actionComboBox);
 
-        switch (configState) {
+        switch (flocks.size() < 5 ? configState : configState + 1) {
             case 0:
                 configPanel.add(createSpeciesPanel());
                 break;
@@ -129,13 +136,14 @@ public class GUI extends JFrame implements ActionListener, ChangeListener {
                 configPanel.add(addBoidPanel());
                 break;
         }
-        if (configState == 1)
-            configPanel.add(updateSpeciesPanel());
+
 
         return configPanel;
     }
 
     private JPanel updateSpeciesPanel() {
+        Flock currentFlock = flocks.get(configCurrentFlockIndex);
+
         int settingsWidth = CONFIG_PANEL_WIDTH - 40;
 
         JPanel updateSpeciesPanel = new JPanel();
@@ -143,41 +151,41 @@ public class GUI extends JFrame implements ActionListener, ChangeListener {
         updateSpeciesPanel.setBounds(0, 150, CONFIG_PANEL_WIDTH, HEIGHT-100);
         updateSpeciesPanel.setBackground(Color.WHITE);
 
-
         JLabel speciesLabel = new JLabel("Espèce");
         speciesLabel.setBounds(20, 0, settingsWidth, 20);
         updateSpeciesPanel.add(speciesLabel);
 
+        ArrayList<String> speciesName = new ArrayList<>();
+        for (Flock flock : flocks) {
+            speciesName.add(flock.getName());
+        }
         speciesComboBox = new JComboBox<>();
-        speciesComboBox.setModel(new DefaultComboBoxModel<>());
+        speciesComboBox.setModel(new DefaultComboBoxModel<>(speciesName.toArray(new String[0])));
+        speciesComboBox.setSelectedIndex(configCurrentFlockIndex);
         speciesComboBox.setBounds(20, 20, settingsWidth, 20);
         speciesComboBox.addActionListener(this);
         updateSpeciesPanel.add(speciesComboBox);
-
-        JLabel nameLabel = new JLabel("Nom");
-        nameLabel.setBounds(20, 60, settingsWidth, 20);
-        updateSpeciesPanel.add(nameLabel);
-
-        updateNameField = new JTextField();
-        updateNameField.setBounds(20, 80, settingsWidth, 20);
-        updateSpeciesPanel.add(updateNameField);
 
         JLabel numberLabel = new JLabel("Nombre");
         numberLabel.setBounds(20, 100, (settingsWidth-20)/2, 20);
         updateSpeciesPanel.add(numberLabel);
 
         updateNumberBoidsField = new JSpinner();
-        updateNumberBoidsField.setModel(new SpinnerNumberModel(1, 1, 100, 1));
+        updateNumberBoidsField.setModel(new SpinnerNumberModel(currentFlock.getBoidsNumber(), 1, 100, 1));
         updateNumberBoidsField.setBounds(20, 120, (settingsWidth-20)/2, 20);
+        updateNumberBoidsField.addChangeListener(this);
         updateSpeciesPanel.add(updateNumberBoidsField);
 
         JLabel colorLabel = new JLabel("Couleur");
         colorLabel.setBounds(30 + settingsWidth/2, 100, (settingsWidth-20)/2, 20);
         updateSpeciesPanel.add(colorLabel);
 
+        int colorIndex = currentFlock.getColor().ordinal();
         updateColorComboBox = new JComboBox<>();
-        updateColorComboBox.setModel(new DefaultComboBoxModel<>(new String[]{"Bleu", "Rouge", "Orange"}));
+        updateColorComboBox.setModel(new DefaultComboBoxModel<>(FlockColor.getColors()));
+        updateColorComboBox.setSelectedIndex(colorIndex);
         updateColorComboBox.setBounds(30 + settingsWidth/2, 120, (settingsWidth-20)/2, 20);
+        updateColorComboBox.addActionListener(this);
         updateSpeciesPanel.add(updateColorComboBox);
 
         JLabel coherenceLabel = new JLabel("Cohérence", SwingConstants.CENTER);
@@ -277,7 +285,7 @@ public class GUI extends JFrame implements ActionListener, ChangeListener {
         createSpeciesPanel.add(colorLabel);
 
         createColorComboBox = new JComboBox<>();
-        createColorComboBox.setModel(new DefaultComboBoxModel<>(new String[]{"Bleu", "Rouge", "Orange"}));
+        createColorComboBox.setModel(new DefaultComboBoxModel<>(FlockColor.getColors()));
         createColorComboBox.setBounds(30 + settingsWidth/2, 60, (settingsWidth-20)/2, 20);
         createSpeciesPanel.add(createColorComboBox);
 
@@ -334,35 +342,49 @@ public class GUI extends JFrame implements ActionListener, ChangeListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        int panel = (flocks.size() < 5 ? configState : configState + 1);
+
         if (e.getSource() == actionComboBox) {
             configState = actionComboBox.getSelectedIndex();
             updateConfigPanel();
-        } else if (e.getSource() == createFlockButton) {
-            if (!createNameField.getText().equals("")) {
-                String name = createNameField.getText();
-                int number = Math.min(100, Math.max(1, (int) createNumberBoidsField.getValue()));
-                Color color;
-                switch (createColorComboBox.getSelectedIndex()) {
-                    case 2:
-                        color = Color.RED;
-                        break;
-                    case 3:
-                        color = Color.ORANGE;
-                        break;
-                    case 1:
-                    default:
-                        color = Color.BLUE;
+        } else if (panel == 0) {
+            if (e.getSource() == createFlockButton) {
+                if (!createNameField.getText().equals("")) {
+                    String name = createNameField.getText();
+                    int number = Math.min(100, Math.max(1, (int) createNumberBoidsField.getValue()));
+                    flocks.add(new Flock(name, number, FlockColor.values()[createColorComboBox.getSelectedIndex()]));
+                    configState = (flocks.size() < 5 ? 1 : 0);
+                    configCurrentFlockIndex = flocks.size() - 1;
+                    updateConfigPanel();
                 }
-                flocks.add(new Flock(name, number, color));
-                configState = 1;
-                updateConfigPanel();
             }
+        } else if (panel == 1) {
+            Flock currentFlock = flocks.get(configCurrentFlockIndex);
 
+            if (e.getSource() == speciesComboBox) {
+                configCurrentFlockIndex = speciesComboBox.getSelectedIndex();
+                updateConfigPanel();
+            } else if (e.getSource() == updateColorComboBox) {
+                currentFlock.setColor(FlockColor.values()[updateColorComboBox.getSelectedIndex()]);
+            }
         }
     }
 
     @Override
     public void stateChanged(ChangeEvent e) {
+        int panel = (flocks.size() < 5 ? configState : configState + 1);
+
+        if (panel == 1) {
+            Flock currentFlock = flocks.get(configCurrentFlockIndex);
+
+            if (e.getSource() == updateNumberBoidsField) {
+                int nbBoids = (int) updateNumberBoidsField.getValue();
+                if (nbBoids >= 1 && nbBoids <= 100) {
+                    System.out.println(nbBoids);
+                    currentFlock.updateBoidNumber(nbBoids);
+                }
+            }
+        }
 
     }
 }

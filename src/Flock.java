@@ -12,9 +12,9 @@ public class Flock {
 	private int viewRange;
 	private double speedMax;
 	private String name;
-	private Color color;
+	private FlockColor color;
 	
-	public Flock(String n, int q, Color c){
+	public Flock(String n, int q, FlockColor c){
 		cohesionCoeff = 0;
 		separationCoeff = 0;
 		alignementCoeff = 0 ;
@@ -41,21 +41,15 @@ public class Flock {
 	
 	}
 	
-	// View Range 
-	public int getViewRange(){return viewRange;}
-	
-	public void setViewRange(int i){viewRange = i;}
-	
-	// Speed Max
-	public double getSpeedMax(){return speedMax;}
-	
-	public void setSpeedMax(double x){speedMax = x;}
-	
 	// Dessin de flock
 	public void drawBoids(Graphics g){
 		for(Boid b : boids){
 			b.drawBoid(g);
 		}
+	}
+
+	public int getBoidsNumber() {
+		return boids.size();
 	}
 	
 	// Getters et setters :
@@ -75,10 +69,38 @@ public class Flock {
 	public void setAlignementCoeff(double c){alignementCoeff = c;}
 	
 	public void setSegregationCoeff(double c){segregationCoeff = c;}
-	
-	public void setColor(Color c){
-		color = c;
-	}
-	
 
+	public int getViewRange(){return viewRange;}
+
+	public void setViewRange(int i){viewRange = i;}
+
+	public double getSpeedMax(){return speedMax;}
+
+	public void setSpeedMax(double x){speedMax = x;}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public FlockColor getColor() {
+		return color;
+	}
+
+	public void setColor(FlockColor color) {
+		this.color = color;
+	}
+
+	public void updateBoidNumber(int nbBoids) {
+		if (nbBoids < boids.size()) {
+			while (boids.size() > nbBoids) {
+				boids.remove(boids.size()-1);
+			}
+		} else {
+			addBoids(nbBoids - boids.size());
+		}
+	}
 }
