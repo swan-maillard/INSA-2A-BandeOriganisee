@@ -19,7 +19,7 @@ public class Flock {
 		separationCoeff = 0;
 		alignementCoeff = 0 ;
 		segregationCoeff = 0;
-		viewRange = 0;
+		viewRange = 150;
 		speedMax = 10;
 		name = n;
 		color = c;
@@ -55,9 +55,12 @@ public class Flock {
 	public int getBoidsNumber() {
 		return boids.size();
 	}
-	
+
+
 	// Getters et setters :
-	
+
+	public ArrayList<Boid> getBoids() {return boids;}
+
 	public double getCohesionCoeff(){return cohesionCoeff;}
 	
 	public double getSeparationCoeff(){return separationCoeff;}

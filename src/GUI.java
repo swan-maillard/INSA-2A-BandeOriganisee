@@ -19,9 +19,9 @@ public class GUI extends JFrame implements ActionListener, ChangeListener, Mouse
     public static int CONFIG_PANEL_WIDTH;
     public static int HEIGHT;
 
-    private final int TIMER_DELAY = 50;
+    private final int TIMER_DELAY = 10000;
 
-    private ArrayList<Flock> flocks;
+    protected static ArrayList<Flock> flocks;
 
     private JComboBox<String> speciesComboBox;
     private JComboBox<String> actionComboBox;
