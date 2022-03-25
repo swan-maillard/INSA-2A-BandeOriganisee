@@ -2,7 +2,13 @@ import java.awt.*;
 
 public enum FlockColor {
 
-    BLUE("Bleu", Color.BLUE), RED("Rouge", Color.RED), ORANGE("Orange", Color.ORANGE);
+    BLACK("Noir", Color.BLACK),
+    WHITE("Blanc", Color.WHITE),
+    RED("Rouge", Color.RED),
+    ORANGE("Orange", Color.ORANGE),
+    GREEN("Vert", Color.GREEN),
+    BLUE("Bleu", Color.BLUE),
+    MAGENTA("Magenta", Color.MAGENTA);
 
     private String name;
     private Color color;

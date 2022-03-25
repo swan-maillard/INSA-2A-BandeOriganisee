@@ -1,5 +1,4 @@
 import com.formdev.flatlaf.FlatLightLaf;
-import jdk.jfr.Event;
 
 import javax.swing.*;
 import javax.swing.Timer;
@@ -307,6 +306,7 @@ public class GUI extends JFrame implements ActionListener, ChangeListener, Mouse
         contentPane.remove(configPanel);
         contentPane.add(configPanel());
         this.setContentPane(contentPane);
+        repaint();
     }
 
     private void runSimulation() {
@@ -339,7 +339,6 @@ public class GUI extends JFrame implements ActionListener, ChangeListener, Mouse
 
         if (e.getSource() == actionComboBox) {
             configState = actionComboBox.getSelectedIndex();
-            updateConfigPanel();
         } else if (panel == 0) {
             if (e.getSource() == createFlockButton) {
                 if (!createNameField.getText().equals("")) {
@@ -348,7 +347,6 @@ public class GUI extends JFrame implements ActionListener, ChangeListener, Mouse
                     flocks.add(new Flock(name, number, FlockColor.values()[createColorComboBox.getSelectedIndex()]));
                     configState = (flocks.size() < 5 ? 1 : 0);
                     configCurrentFlockIndex = flocks.size() - 1;
-                    updateConfigPanel();
                 }
             }
         } else if (panel == 1) {
@@ -356,7 +354,6 @@ public class GUI extends JFrame implements ActionListener, ChangeListener, Mouse
 
             if (e.getSource() == speciesComboBox) {
                 configCurrentFlockIndex = speciesComboBox.getSelectedIndex();
-                updateConfigPanel();
             } else if (e.getSource() == updateColorComboBox) {
                 currentFlock.setColor(FlockColor.values()[updateColorComboBox.getSelectedIndex()]);
             } else if (e.getSource() == updateNumberBoidsField) {
@@ -368,16 +365,16 @@ public class GUI extends JFrame implements ActionListener, ChangeListener, Mouse
                 flocks.remove(currentFlock);
                 configCurrentFlockIndex = 0;
                 configState = (flocks.size() > 0 ? 1 : 0);
-                updateConfigPanel();
             }
 
             if (e instanceof MouseEvent) {
                 Point location = ((MouseEvent) e).getPoint();
                 Insets insets = this.getInsets();
                 currentFlock.addBoidAt(location.x + insets.left, location.y + insets.top);
-                updateConfigPanel();
             }
         }
+
+        updateConfigPanel();
     }
 
     @Override
