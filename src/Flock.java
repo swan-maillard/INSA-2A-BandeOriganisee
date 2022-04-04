@@ -1,26 +1,22 @@
-import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.*;
 import java.util.ArrayList;
 
 public class Flock {
 
 	private ArrayList<Boid> boids;
-	private double cohesionCoeff;
-	private double separationCoeff;
-	private double alignementCoeff;
-	private double segregationCoeff;
-	private int viewRange;
-	private double speedMax;
+	private double cohesionCoeff = 0.005;
+	private double separationCoeff = 1;
+	private double alignementCoeff = 1;
+	private double segregationCoeff = 1;
+	private int viewRange = 100;
+	private double speedMax = 10;
 	private String name;
 	private FlockColor color;
-	
+
+	public boolean displayViewRange = false;
+	public boolean displayTrails = false;
+
 	public Flock(String n, int q, FlockColor c){
-		cohesionCoeff = 0;
-		separationCoeff = 0;
-		alignementCoeff = 0 ;
-		segregationCoeff = 0;
-		viewRange = 150;
-		speedMax = 10;
 		name = n;
 		color = c;
 		boids = new ArrayList<Boid>();
@@ -46,9 +42,9 @@ public class Flock {
 	}
 	
 	// Dessin de flock
-	public void drawBoids(Graphics g){
+	public void drawBoids(Graphics2D g){
 		for(Boid b : boids){
-			b.drawBoid(g);
+			b.draw(g);
 		}
 	}
 
@@ -109,5 +105,10 @@ public class Flock {
 		} else {
 			addBoids(nbBoids - boids.size());
 		}
+	}
+
+	@Override
+	public String toString() {
+		return "Flock " + name + " : " + getBoidsNumber() + " boids";
 	}
 }
