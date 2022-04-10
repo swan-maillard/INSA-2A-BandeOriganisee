@@ -68,6 +68,8 @@ public class Boid {
 
         findNeighbours();
         computeCohesionForce();
+        computeSegregationForces();
+        computeSeparationForces();
         computeObstacleAvoidanceForce();
         computeWallAvoidanceForce();
         applyForces();
@@ -83,6 +85,24 @@ public class Boid {
             flockCenter.divide(flockNeighbours.size());
             Vector2D cohesionForce = Vector2D.substract(flockCenter, position).substract(vitesse).multiply(flock.getCohesionCoeff());
             forces.add(cohesionForce);
+        }
+    }
+
+    private void computeSegregationForces(){ //proportionnel à 1/distance
+        for (Boid boid : strangerNeighbours) {
+            Vector2D vecteur = Vector2D.substract(this.position,boid.position);
+            forces.add(vecteur.multiply(flock.getSegregationCoeff()));
+        }
+    }
+    private void computeSeparationForces(){
+        ArrayList<Boid> neighbours = new ArrayList<>();
+        neighbours.addAll(flockNeighbours);
+        neighbours.addAll(strangerNeighbours);
+        for(Boid boid : neighbours){
+            if (Vector2D.substract(this.position, boid.position).norm() <= REPULSE_RANGE) {
+                Vector2D vecteur = Vector2D.substract(this.position,boid.position).substract(vitesse).multiply(flock.getSeparationCoeff());
+                forces.add(vecteur);
+            }
         }
     }
 
@@ -108,8 +128,10 @@ public class Boid {
 
                 if (BO.norm() <= obstacle.avoidanceRadius) {
                     forces = force;
+                } else {
+                    forces.add(force.multiply(0.5));
                 }
-                forces.add(force.multiply(0.5));
+
 
             }
         }

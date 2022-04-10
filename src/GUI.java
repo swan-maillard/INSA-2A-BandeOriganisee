@@ -20,6 +20,9 @@ public class GUI extends JFrame implements ActionListener, ChangeListener, Mouse
     protected static ArrayList<Flock> flocks = new ArrayList<>();
     protected static ArrayList<Obstacle> obstacles = new ArrayList<>();
 
+    private final static String[] configActions = new String[]{"Créer une espèce", "Modifier une espèce", "Ajouter un obstacle"};
+    private int[] configActionsDisplayed;
+
     private JComboBox<String> speciesComboBox;
     private JComboBox<String> actionComboBox;
     private JSlider cohesionSlider;
@@ -39,6 +42,9 @@ public class GUI extends JFrame implements ActionListener, ChangeListener, Mouse
     private JSpinner updateNumberBoidsField;
     private JComboBox<String> updateColorComboBox;
     private JButton deleteFlockButton;
+
+    private JSpinner obstacleSizeField;
+    private JComboBox<String> obstacleColorComboBox;
 
     private JPanel simulationPanel;
     private JPanel configPanel;
@@ -80,7 +86,6 @@ public class GUI extends JFrame implements ActionListener, ChangeListener, Mouse
         contentPane.add(simulationPanel);
 
         flocks.add(new Flock("Espèce 1", 100, FlockColor.RED));
-        obstacles.add(new Obstacle(new Vector2D(400, 400), 20));
 
         contentPane.add(configPanel());
 
@@ -106,11 +111,15 @@ public class GUI extends JFrame implements ActionListener, ChangeListener, Mouse
 
         ArrayList<String> actionItems = new ArrayList<>();
         if (flocks.isEmpty()) {
-            actionItems.addAll(List.of("Créer une espèce"));
+            configActionsDisplayed = new int[]{0, 2}; // Créer espèce et ajouter obstacle
         } else if (flocks.size() == 5) {
-            actionItems.addAll(List.of("Modifier une espèce"));
+            configActionsDisplayed = new int[]{1, 2}; // Modifier espèce et ajouter obstacle
         } else {
-            actionItems.addAll(List.of("Créer une espèce", "Modifier une espèce"));
+            configActionsDisplayed = new int[]{0, 1, 2}; // Créer espèce, modifier espèce et ajouter obstacle
+        }
+
+        for (int actionIndex : configActionsDisplayed) {
+            actionItems.add(configActions[actionIndex]);
         }
 
         actionComboBox = new JComboBox<>();
@@ -120,12 +129,15 @@ public class GUI extends JFrame implements ActionListener, ChangeListener, Mouse
         actionComboBox.addActionListener(this);
         configPanel.add(actionComboBox);
 
-        switch (flocks.size() < 5 ? configState : configState + 1) {
+        switch (configState) {
             case 0:
                 configPanel.add(createSpeciesPanel());
                 break;
             case 1:
                 configPanel.add(updateSpeciesPanel());
+                break;
+            case 2:
+                configPanel.add(createObstaclePanel());
                 break;
         }
 
@@ -293,6 +305,35 @@ public class GUI extends JFrame implements ActionListener, ChangeListener, Mouse
         return updateSpeciesPanel;
     }
 
+    private JPanel createObstaclePanel() {
+        int settingsWidth = CONFIG_PANEL_WIDTH - 40;
+        JPanel createObstaclePanel = new JPanel();
+
+        createObstaclePanel.setLayout(null);
+        createObstaclePanel.setBounds(0, 150, CONFIG_PANEL_WIDTH, HEIGHT-100);
+        createObstaclePanel.setBackground(Color.WHITE);
+
+        JLabel obstacleSizeLabel = new JLabel("Taille");
+        obstacleSizeLabel.setBounds(20, 0, settingsWidth, 20);
+        createObstaclePanel.add(obstacleSizeLabel);
+
+        obstacleSizeField = new JSpinner();
+        obstacleSizeField.setModel(new SpinnerNumberModel(50, 10, 1000, 1));
+        obstacleSizeField.setBounds(20, 20, (settingsWidth-20)/2, 20);
+        createObstaclePanel.add(obstacleSizeField);
+
+        JLabel colorLabel = new JLabel("Couleur");
+        colorLabel.setBounds(30 + settingsWidth/2, 0, (settingsWidth-20)/2, 20);
+        createObstaclePanel.add(colorLabel);
+
+        obstacleColorComboBox = new JComboBox<>();
+        obstacleColorComboBox.setModel(new DefaultComboBoxModel<>(FlockColor.getColors()));
+        obstacleColorComboBox.setBounds(30 + settingsWidth/2, 20, (settingsWidth-20)/2, 20);
+        createObstaclePanel.add(obstacleColorComboBox);
+
+        return createObstaclePanel;
+    }
+
     private void updateConfigPanel() {
         JPanel contentPane = (JPanel) this.getContentPane();
         contentPane.remove(configPanel);
@@ -300,6 +341,7 @@ public class GUI extends JFrame implements ActionListener, ChangeListener, Mouse
         this.setContentPane(contentPane);
         simulationPanel.repaint();
     }
+
 
     private void runSimulation() {
         timer = new Timer(TIMER_DELAY, (ActionEvent e) -> {
@@ -319,12 +361,11 @@ public class GUI extends JFrame implements ActionListener, ChangeListener, Mouse
     }
 
     private void doAction(EventObject e) {
-        int panel = (flocks.size() < 5 ? configState : configState + 1);
         Object src = e.getSource();
 
         if (src == actionComboBox) {
             configState = actionComboBox.getSelectedIndex();
-        } else if (panel == 0) {
+        } else if (configState == 0) {
             if (src == createFlockButton) {
                 if (!createNameField.getText().equals("")) {
                     String name = createNameField.getText();
@@ -334,7 +375,7 @@ public class GUI extends JFrame implements ActionListener, ChangeListener, Mouse
                     configCurrentFlockIndex = flocks.size() - 1;
                 }
             }
-        } else if (panel == 1) {
+        } else if (configState == 1) {
             Flock currentFlock = flocks.get(configCurrentFlockIndex);
 
             if (src == speciesComboBox) {
@@ -376,6 +417,14 @@ public class GUI extends JFrame implements ActionListener, ChangeListener, Mouse
                 if (currentFlock.getBoidsNumber() < 100) {
                     currentFlock.addBoidAt(location.x, location.y);
                 }
+            }
+        } else if (configState == 2) {
+            if (e instanceof MouseEvent) {
+                Point location = ((MouseEvent) e).getPoint();
+                Vector2D position = new Vector2D(location.x, location.y);
+                int size = (int) obstacleSizeField.getValue();
+                FlockColor color = FlockColor.values()[obstacleColorComboBox.getSelectedIndex()];
+                GUI.obstacles.add(new Obstacle(position, size, color));
             }
         }
 
