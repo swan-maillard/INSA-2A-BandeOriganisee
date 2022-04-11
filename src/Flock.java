@@ -10,13 +10,17 @@ public class Flock {
 	private double segregationCoeff = 1;
 	private int viewRange = 100;
 	private double speedMax = 10;
+	private int fuiteCoeff = 1;
+	private int chasseCoeff = 1;
 	private String name;
 	private FlockColor color;
+	public int type;
 
 	public boolean displayViewRange = false;
 	public boolean displayTrails = false;
 
-	public Flock(String n, int q, FlockColor c){
+	public Flock(String n, int q, int t, FlockColor c){
+		type = t;
 		name = n;
 		color = c;
 		boids = new ArrayList<Boid>();
@@ -72,6 +76,14 @@ public class Flock {
 	public void setAlignementCoeff(double c){alignementCoeff = c;}
 	
 	public void setSegregationCoeff(double c){segregationCoeff = c;}
+
+	public void setFuiteCoeff(int c){fuiteCoeff = c;}
+
+	public int getFuiteCoeff(){return fuiteCoeff;}
+
+	public void setChasseCoeff(int c) {chasseCoeff = c;}
+
+	public int getChasseCoeff(){return chasseCoeff;}
 
 	public int getViewRange(){return viewRange;}
 

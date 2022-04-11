@@ -85,8 +85,8 @@ public class GUI extends JFrame implements ActionListener, ChangeListener, Mouse
         simulationPanel.addMouseListener(this);
         contentPane.add(simulationPanel);
 
-        flocks.add(new Flock("Espèce 1", 100, FlockColor.RED));
-
+        flocks.add(new Flock("Espèce 1", 100,0, FlockColor.RED));
+        flocks.add(new Flock("Espèce 2", 1,1, FlockColor.BLACK));
         contentPane.add(configPanel());
 
         this.setContentPane(contentPane);
@@ -370,7 +370,7 @@ public class GUI extends JFrame implements ActionListener, ChangeListener, Mouse
                 if (!createNameField.getText().equals("")) {
                     String name = createNameField.getText();
                     int number = Math.min(100, Math.max(0, (int) createNumberBoidsField.getValue()));
-                    flocks.add(new Flock(name, number, FlockColor.values()[createColorComboBox.getSelectedIndex()]));
+                    flocks.add(new Flock(name, number,0, FlockColor.values()[createColorComboBox.getSelectedIndex()]));
                     configState = (flocks.size() < 5 ? 1 : 0);
                     configCurrentFlockIndex = flocks.size() - 1;
                 }

@@ -18,6 +18,7 @@ public class Boid {
     private ArrayList<Boid> flockNeighbours;
     private Flock flock;
 
+
     public Boid(Flock flock) {
         this(flock, Math.random() * GUI.SIMULATION_PANEL_WIDTH, Math.random() * GUI.HEIGHT);
     }
@@ -68,10 +69,17 @@ public class Boid {
 
         findNeighbours();
         computeCohesionForce();
-        computeSegregationForces();
         computeSeparationForces();
+        computeAlignementForces();
         computeObstacleAvoidanceForce();
         computeWallAvoidanceForce();
+
+        if(flock.type ==0) { //0 = proie
+            computeSegregationForces();
+            computeFuiteForces();
+        }else{
+            computeChasseForces();
+        }
         applyForces();
     }
 
@@ -106,6 +114,16 @@ public class Boid {
         }
     }
 
+    private void computeAlignementForces(){
+        Vector2D vitesseFlock = new Vector2D();
+        for(Boid boid : flockNeighbours){
+           vitesseFlock =vitesseFlock.add(boid.vitesse) ;
+        }
+        vitesseFlock.divide(flockNeighbours.size());
+        this.forces = this.forces.add(vitesseFlock.multiply(flock.getAlignementCoeff()));
+
+    }
+
     private void computeObstacleAvoidanceForce() {
         for (Obstacle obstacle : GUI.obstacles) {
             if (willCollideObstacle(obstacle)) {
@@ -135,6 +153,33 @@ public class Boid {
 
             }
         }
+    }
+
+    private void computeFuiteForces(){
+        ArrayList<Boid> neighbours = new ArrayList<>();
+        neighbours.addAll(flockNeighbours);
+        neighbours.addAll(strangerNeighbours);
+        for (Boid boid : neighbours){
+            if (boid.flock.type ==1){
+                Vector2D distance = Vector2D.substract(boid.position,this.position);
+                forces.add(distance.multiply(flock.getFuiteCoeff()));
+            }
+        }
+
+    }
+
+    private void computeChasseForces(){
+        Vector2D barycentre =new Vector2D();
+        for (Boid boid : flockNeighbours){
+            if(boid.flock.type==0){
+                barycentre.add(boid.position);
+            }
+        }
+        if(barycentre.norm()!=0 ) {
+            barycentre.divide(flockNeighbours.size());
+            forces.add(barycentre.substract(this.position).multiply(flock.getChasseCoeff()));
+        }
+
     }
 
     private boolean willCollideObstacle(Obstacle obstacle) {
