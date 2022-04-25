@@ -1,6 +1,6 @@
 import java.awt.*;
 
-public enum FlockColor {
+public enum Colors {
 
     BLACK("Noir", Color.BLACK),
     WHITE("Blanc", Color.WHITE),
@@ -13,15 +13,15 @@ public enum FlockColor {
     private String name;
     private Color color;
 
-    FlockColor(String name, Color color) {
+    Colors(String name, Color color) {
         this.name = name;
         this.color = color;
     }
 
     public static String[] getColors() {
-        String[] colors = new String[FlockColor.values().length];
+        String[] colors = new String[Colors.values().length];
         for (int i = 0; i < colors.length; i++) {
-            colors[i] = FlockColor.values()[i].getName();
+            colors[i] = Colors.values()[i].getName();
         }
 
         return colors;
