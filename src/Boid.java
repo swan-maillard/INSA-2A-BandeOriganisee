@@ -9,7 +9,7 @@ public class Boid {
     private final double DEAD_ANGLE = 45;
     private final double REPULSE_RANGE = 20;
 
-    private Vector2D location;
+    private Vector2D position;
     private Vector2D velocity;
     private Vector2D forces;
     private ArrayList<Vector2D> trails;
@@ -26,14 +26,14 @@ public class Boid {
 
     public Boid(Flock flock, double x, double y) {
         this.flock = flock;
-        location = new Vector2D(x, y);
+        position = new Vector2D(x, y);
         setRandomVelocity();
         forces = new Vector2D();
         trails = new ArrayList<>(MAX_TRAILS);
     }
 
     public void setRandomLocation() {
-        location = new Vector2D(Math.random() * AppView.SIMULATION_PANEL_WIDTH, Math.random() * AppView.HEIGHT);
+        position = new Vector2D(Math.random() * AppView.SIMULATION_PANEL_WIDTH, Math.random() * AppView.HEIGHT);
     }
 
     public void setRandomVelocity() {
@@ -50,7 +50,7 @@ public class Boid {
         for (Flock fl : App.flocks) {
             for (Boid boid : fl.getBoids()) {
 
-                Vector2D vectorBetweenBoids = Vector2D.subtract(boid.location, this.location);
+                Vector2D vectorBetweenBoids = Vector2D.subtract(boid.position, this.position);
                 double angleBoid = Math.atan2(velocity.y, velocity.x);
                 double angleBetweenBoids = Math.abs(Math.atan2(vectorBetweenBoids.y, vectorBetweenBoids.x));
                 double deadAngleRadian = Math.PI * DEAD_ANGLE / 180;
@@ -76,11 +76,11 @@ public class Boid {
         computeCohesionForce();
         computeSeparationForce();
         computeAlignementForce();
+        computeIntoleranceForce();
 
-        if (flock.isPredator) {
+        if (flock.getType() == App.TYPE_PREDATOR) {
             computeHuntingForce();
         } else {
-            computeIntoleranceForce();
             computeFleeingForce();
         }
 
@@ -94,12 +94,12 @@ public class Boid {
         Vector2D cohesionForce = new Vector2D();
         Vector2D flockCenter = new Vector2D();
         for (Boid boid : flockNeighbours) {
-            flockCenter.add(boid.location);
+            flockCenter.add(boid.position);
         }
 
         if (!flockNeighbours.isEmpty()) {
             flockCenter.divide(flockNeighbours.size());
-            cohesionForce = Vector2D.subtract(flockCenter, location).subtract(velocity).multiply(flock.getCohesionCoeff());
+            cohesionForce = Vector2D.subtract(flockCenter, position).subtract(velocity).multiply(flock.getCohesionCoeff());
         }
         forces.add(cohesionForce);
     }
@@ -125,8 +125,8 @@ public class Boid {
         neighbours.addAll(flockNeighbours);
         neighbours.addAll(strangerNeighbours);
         for (Boid boid : neighbours) {
-            if (Vector2D.subtract(this.location, boid.location).norm() <= REPULSE_RANGE) {
-                separationForce = Vector2D.subtract(this.location, boid.location).subtract(velocity).multiply(flock.getSeparationCoeff());
+            if (Vector2D.subtract(this.position, boid.position).norm() <= REPULSE_RANGE) {
+                separationForce = Vector2D.subtract(this.position, boid.position).subtract(velocity).multiply(flock.getSeparationCoeff());
             }
         }
         forces.add(separationForce);
@@ -150,14 +150,14 @@ public class Boid {
         Vector2D preysFlockCenter = new Vector2D();
         int nbPreys = 0;
         for (Boid boid : strangerNeighbours) {
-            if (!boid.flock.isPredator) {
-                preysFlockCenter.add(boid.location);
+            if (boid.flock.getType() == App.TYPE_PREY) {
+                preysFlockCenter.add(boid.position);
                 nbPreys++;
             }
         }
         if (nbPreys > 0) {
             preysFlockCenter.divide(nbPreys);
-            huntingForce.add(Vector2D.subtract(preysFlockCenter, location)).multiply(flock.getHuntingCoeff());
+            huntingForce.add(Vector2D.subtract(preysFlockCenter, position)).multiply(flock.getHuntingCoeff());
         }
         forces.add(huntingForce);
     }
@@ -167,16 +167,16 @@ public class Boid {
 
         Boid closestPredator = null;
         for (Boid boid : strangerNeighbours) {
-            if (boid.flock.isPredator) {
-                double boidDistance = Vector2D.subtract(boid.location, this.location).norm();
-                if (closestPredator == null ||  boidDistance < Vector2D.subtract(closestPredator.location, this.location).norm()) {
+            if (boid.flock.getType() == App.TYPE_PREDATOR) {
+                double boidDistance = Vector2D.subtract(boid.position, this.position).norm();
+                if (closestPredator == null ||  boidDistance < Vector2D.subtract(closestPredator.position, this.position).norm()) {
                     closestPredator = boid;
                 }
             }
         }
 
         if (closestPredator != null) {
-            fleeingForce.add(Vector2D.subtract(this.location, closestPredator.location));
+            fleeingForce.add(Vector2D.subtract(this.position, closestPredator.position));
         }
         forces.add(fleeingForce);
     }
@@ -184,7 +184,7 @@ public class Boid {
     private void computeObstacleAvoidanceForce() {
         for (Obstacle obstacle : App.obstacles) {
             if (willCollideObstacle(obstacle)) {
-                Vector2D BO = Vector2D.subtract(obstacle.position, this.location); // Vecteur entre le boid et le centre de l'obstacle
+                Vector2D BO = Vector2D.subtract(obstacle.position, this.position); // Vecteur entre le boid et le centre de l'obstacle
                 double projection = Math.sqrt(Math.pow(BO.norm(), 2) - Math.pow(obstacle.avoidanceRadius, 2)); // Projection de BO sur une direction qui ne traverse pas l'obstacle
 
                 double m;
@@ -211,7 +211,7 @@ public class Boid {
     }
 
     private boolean willCollideObstacle(Obstacle obstacle) {
-        Vector2D BO = Vector2D.subtract(obstacle.position, this.location); // Vecteur entre le boid et le centre de l'obstacle
+        Vector2D BO = Vector2D.subtract(obstacle.position, this.position); // Vecteur entre le boid et le centre de l'obstacle
         double projection = Vector2D.scalarProduct(BO, velocity.normalized()); // Projection de BO sur la direction du boid
         double distanceBoidObstacle = Math.sqrt(Math.pow(BO.norm(), 2) - Math.pow(projection, 2)); // Plus petite distance de l'obstacle que le boid pourra atteindre
 
@@ -220,15 +220,15 @@ public class Boid {
 
     private void computeWallAvoidanceForce() {
         double forceIntensity = 3;
-        if (location.x - REPULSE_RANGE <= 150) {
+        if (position.x - REPULSE_RANGE <= 150) {
             forces.add(new Vector2D(forceIntensity, 0));
-        } else if (location.x + REPULSE_RANGE >= AppView.SIMULATION_PANEL_WIDTH - 150) {
+        } else if (position.x + REPULSE_RANGE >= AppView.SIMULATION_PANEL_WIDTH - 150) {
             forces.add(new Vector2D(-forceIntensity, 0));
         }
 
-        if (location.y - REPULSE_RANGE <= 150) {
+        if (position.y - REPULSE_RANGE <= 150) {
             forces.add(new Vector2D(0, forceIntensity));
-        } else if (location.y + REPULSE_RANGE >= AppView.HEIGHT - 150) {
+        } else if (position.y + REPULSE_RANGE >= AppView.HEIGHT - 150) {
             forces.add(new Vector2D(0, -forceIntensity));
         }
     }
@@ -237,7 +237,7 @@ public class Boid {
         if (trails.size() > MAX_TRAILS) {
             trails.remove(0);
         }
-        trails.add(new Vector2D(location));
+        trails.add(new Vector2D(position));
 
         velocity.add(forces);
         if (velocity.norm() > flock.getSpeedLimit()) {
@@ -246,7 +246,7 @@ public class Boid {
             velocity.scaleNorm(App.BOIDS_MIN_SPEED);
         }
 
-        location.add(velocity);
+        position.add(velocity);
     }
 
     public void draw(Graphics2D g) {
@@ -270,7 +270,7 @@ public class Boid {
 
         AffineTransform initState = g.getTransform();
 
-        g.translate(location.x, location.y);
+        g.translate(position.x, position.y);
 
         double directionAngle = Math.atan2(velocity.y, velocity.x);
         g.rotate(directionAngle);
@@ -288,7 +288,7 @@ public class Boid {
 
         AffineTransform initState = g.getTransform();
 
-        g.translate(location.x, location.y);
+        g.translate(position.x, position.y);
 
         double directionAngle = Math.atan2(velocity.y, velocity.x);
         g.rotate(directionAngle);
@@ -301,7 +301,7 @@ public class Boid {
     public void drawTrails(Graphics2D g) {
         for (int i = 0; i < trails.size(); i++) {
             Vector2D currentTrail = trails.get(i);
-            Vector2D nextTrack = (i < trails.size() - 1) ? trails.get(i + 1) : location;
+            Vector2D nextTrack = (i < trails.size() - 1) ? trails.get(i + 1) : position;
             int alpha = i * 255 / trails.size();
             Color colorTrail = flock.getColors().getColor().darker();
             g.setColor(new Color(colorTrail.getRed(), colorTrail.getGreen(), colorTrail.getBlue(), alpha));
@@ -314,6 +314,6 @@ public class Boid {
     }
 
     public String toString() {
-        return "Boid en " + location;
+        return "Boid en " + position;
     }
 }

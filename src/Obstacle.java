@@ -18,8 +18,6 @@ public class Obstacle {
     public void draw(Graphics2D g) {
         g.setColor(color.getColor());
         g.fill(new Ellipse2D.Double(position.x - radius, position.y - radius, 2 * radius, 2 * radius));
-        g.setColor(Color.RED);
-        g.draw(new Ellipse2D.Double(position.x - avoidanceRadius, position.y - avoidanceRadius, 2 * avoidanceRadius, 2 * avoidanceRadius));
     }
 
 }

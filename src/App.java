@@ -4,16 +4,19 @@ import java.util.ArrayList;
 
 public class App {
 
-    private static final int TIMER_DELAY = 50;
+    public static final int TIMER_DELAY = 50;
     public static final int MAX_BOIDS_PER_FLOCK = 100;
     public static final int BOIDS_MIN_SPEED = 5;
     public static final int BOIDS_MAX_SPEED = 15;
 
-    protected static ArrayList<Flock> flocks = new ArrayList<>();
-    protected static ArrayList<Obstacle> obstacles = new ArrayList<>();
+    public static final int TYPE_PREY = 0;
+    public static final int TYPE_PREDATOR = 1;
 
-    protected static int controlCurrentState = 1;
-    protected static int controlCurrentFlockIndex = 0;
+    public static ArrayList<Flock> flocks = new ArrayList<>();
+    public static ArrayList<Obstacle> obstacles = new ArrayList<>();
+
+    public static int controlCurrentState = 1;
+    public static int controlCurrentFlockIndex = 0;
 
     private static AppView appView;
 
@@ -32,10 +35,10 @@ public class App {
         appView.repaintControls();
     }
 
-    public static void addFlock(String name, int number, Colors colors) {
+    public static void addFlock(String name, int number, Colors colors, int type) {
         if (!name.equals("")) {
             number = Math.min(MAX_BOIDS_PER_FLOCK, Math.max(0, number));
-            flocks.add(new Flock(name, number, false, colors));
+            flocks.add(new Flock(name, number, colors, type));
             controlCurrentState = (flocksSize() < 5 ? 1 : 0);
             controlCurrentFlockIndex = Math.max(0, flocksSize() - 1);
         }
@@ -49,18 +52,9 @@ public class App {
         }
     }
 
-    public static void addPredator(String name, int number, Colors colors) {
-        if (!name.equals("")) {
-            number = Math.min(MAX_BOIDS_PER_FLOCK, Math.max(0, number));
-            flocks.add(new Flock(name, number, true, colors));
-            controlCurrentState = (flocksSize() < 5 ? 1 : 0);
-            controlCurrentFlockIndex = Math.max(0, flocksSize() - 1);
-        }
-    }
-
     public static void removeFlock(Flock flock) {
         flocks.remove(flock);
-        controlCurrentFlockIndex = 0;
+        controlCurrentFlockIndex = ControlsView.CREATE_FLOCK_INDEX;
         controlCurrentState = (flocksSize() > 0 ? 1 : 0);
     }
 

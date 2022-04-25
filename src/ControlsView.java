@@ -4,10 +4,15 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.EventObject;
 
 public class ControlsView extends JPanel implements ActionListener, ChangeListener {
+
+    public static final int CREATE_FLOCK_INDEX = 0;
+    public static final int UPDATE_FLOCK_INDEX = 1;
+    public static final int ADD_OBSTACLE_INDEX = 2;
 
     private static final String[] controlsActions = new String[]{"Créer une espèce", "Modifier une espèce", "Ajouter un obstacle"};
     private int[] controlsActionsDisplayed;
@@ -26,10 +31,12 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
     private JTextField createFlockNameField;
     private JSpinner createFlockNumberField;
     private JComboBox<String> createFlockColorComboBox;
+    private JComboBox<String> createFlockTypeComboBox;
     private JButton createFlockButton;
 
     private JSpinner updateFlockNumberField;
     private JComboBox<String> updateFlockColorComboBox;
+    private JComboBox<String> updateFlockTypeComboBox;
     private JButton resetFlockButton;
     private JButton deleteFlockButton;
 
@@ -50,11 +57,11 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
 
         ArrayList<String> actionItems = new ArrayList<>();
         if (App.flocksSize() == 0) {
-            controlsActionsDisplayed = new int[]{0, 2}; // Créer espèce et ajouter obstacle
+            controlsActionsDisplayed = new int[]{CREATE_FLOCK_INDEX, ADD_OBSTACLE_INDEX}; // Créer espèce et ajouter obstacle
         } else if (App.flocksSize() == 5) {
-            controlsActionsDisplayed = new int[]{1, 2}; // Modifier espèce et ajouter obstacle
+            controlsActionsDisplayed = new int[]{CREATE_FLOCK_INDEX, ADD_OBSTACLE_INDEX}; // Modifier espèce et ajouter obstacle
         } else {
-            controlsActionsDisplayed = new int[]{0, 1, 2}; // Créer espèce, modifier espèce et ajouter obstacle
+            controlsActionsDisplayed = new int[]{CREATE_FLOCK_INDEX, UPDATE_FLOCK_INDEX, ADD_OBSTACLE_INDEX}; // Créer espèce, modifier espèce et ajouter obstacle
         }
 
         for (int actionIndex : controlsActionsDisplayed) {
@@ -69,13 +76,13 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
         this.add(actionComboBox);
 
         switch (App.controlCurrentState) {
-            case 0:
+            case CREATE_FLOCK_INDEX:
                 this.add(createFlockPanel());
                 break;
-            case 1:
+            case UPDATE_FLOCK_INDEX:
                 this.add(updateFlockPanel());
                 break;
-            case 2:
+            case ADD_OBSTACLE_INDEX:
                 this.add(createObstaclePanel());
                 break;
         }
@@ -98,22 +105,31 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
         createFlockPanel.add(createFlockNameField);
 
         JLabel numberLabel = new JLabel("Nombre");
-        numberLabel.setBounds(20, 40, (settingsWidth - 20) / 2, 20);
+        numberLabel.setBounds(20, 40, (settingsWidth - 20) / 3, 20);
         createFlockPanel.add(numberLabel);
 
         createFlockNumberField = new JSpinner();
         createFlockNumberField.setModel(new SpinnerNumberModel(1, 0, App.MAX_BOIDS_PER_FLOCK, 1));
-        createFlockNumberField.setBounds(20, 60, (settingsWidth - 20) / 2, 20);
+        createFlockNumberField.setBounds(20, 60, (settingsWidth - 20) / 3, 20);
         createFlockPanel.add(createFlockNumberField);
 
         JLabel colorLabel = new JLabel("Couleur");
-        colorLabel.setBounds(30 + settingsWidth / 2, 40, (settingsWidth - 20) / 2, 20);
+        colorLabel.setBounds(20 + settingsWidth / 3, 40, (settingsWidth - 20) / 3, 20);
         createFlockPanel.add(colorLabel);
 
         createFlockColorComboBox = new JComboBox<>();
         createFlockColorComboBox.setModel(new DefaultComboBoxModel<>(Colors.getColors()));
-        createFlockColorComboBox.setBounds(30 + settingsWidth / 2, 60, (settingsWidth - 20) / 2, 20);
+        createFlockColorComboBox.setBounds(20 + settingsWidth / 3, 60, (settingsWidth - 20) / 3, 20);
         createFlockPanel.add(createFlockColorComboBox);
+
+        JLabel typeLabel = new JLabel("Type");
+        typeLabel.setBounds(20 + 2*settingsWidth/3, 40, (settingsWidth - 20) / 3, 20);
+        createFlockPanel.add(typeLabel);
+
+        createFlockTypeComboBox = new JComboBox<>();
+        createFlockTypeComboBox.setModel(new DefaultComboBoxModel<>(new String[]{"Proies", "Prédateurs"}));
+        createFlockTypeComboBox.setBounds(20 + 2*settingsWidth/3, 60, (settingsWidth - 20) / 3, 20);
+        createFlockPanel.add(createFlockTypeComboBox);
 
         createFlockButton = new JButton("Créer l'espèce");
         createFlockButton.setBounds(20, 100, settingsWidth, 20);
@@ -146,26 +162,38 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
         updateFlockPanel.add(flocksComboBox);
 
         JLabel numberLabel = new JLabel("Nombre");
-        numberLabel.setBounds(20, 100, (settingsWidth - 20) / 2, 20);
+        numberLabel.setBounds(20, 100, (settingsWidth - 20) / 3, 20);
         updateFlockPanel.add(numberLabel);
 
         updateFlockNumberField = new JSpinner();
         updateFlockNumberField.setModel(new SpinnerNumberModel(currentFlock.getBoidsNumber(), 0, App.MAX_BOIDS_PER_FLOCK, 1));
-        updateFlockNumberField.setBounds(20, 120, (settingsWidth - 20) / 2, 20);
+        updateFlockNumberField.setBounds(20, 120, (settingsWidth - 20) / 3, 20);
         updateFlockNumberField.addChangeListener(this);
         updateFlockPanel.add(updateFlockNumberField);
 
         JLabel colorLabel = new JLabel("Couleur");
-        colorLabel.setBounds(30 + settingsWidth / 2, 100, (settingsWidth - 20) / 2, 20);
+        colorLabel.setBounds(20 + settingsWidth / 3, 100, (settingsWidth - 20) / 3, 20);
         updateFlockPanel.add(colorLabel);
 
         int colorIndex = currentFlock.getColors().ordinal();
         updateFlockColorComboBox = new JComboBox<>();
         updateFlockColorComboBox.setModel(new DefaultComboBoxModel<>(Colors.getColors()));
         updateFlockColorComboBox.setSelectedIndex(colorIndex);
-        updateFlockColorComboBox.setBounds(30 + settingsWidth / 2, 120, (settingsWidth - 20) / 2, 20);
+        updateFlockColorComboBox.setBounds(20 + settingsWidth / 3, 120, (settingsWidth - 20) / 3, 20);
         updateFlockColorComboBox.addActionListener(this);
         updateFlockPanel.add(updateFlockColorComboBox);
+
+        JLabel typeLabel = new JLabel("Type");
+        typeLabel.setBounds(20 + 2*settingsWidth/3, 100, (settingsWidth - 20) / 3, 20);
+        updateFlockPanel.add(typeLabel);
+
+        updateFlockTypeComboBox = new JComboBox<>();
+        updateFlockTypeComboBox = new JComboBox<>();
+        updateFlockTypeComboBox.setModel(new DefaultComboBoxModel<>(new String[]{"Proies", "Prédateurs"}));
+        updateFlockTypeComboBox.setSelectedIndex(currentFlock.getType());
+        updateFlockTypeComboBox.setBounds(20 + 2*settingsWidth/3, 120, (settingsWidth - 20) / 3, 20);
+        updateFlockTypeComboBox.addActionListener(this);
+        updateFlockPanel.add(updateFlockTypeComboBox);
 
         JLabel cohesionLabel = new JLabel("Cohésion", SwingConstants.CENTER);
         cohesionLabel.setBounds(20, 160, settingsWidth / 3, 20);
@@ -273,17 +301,19 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
         return createObstaclePanel;
     }
 
-    private void doAction(EventObject e) {
+    public void doAction(EventObject e) {
         Object src = e.getSource();
+        boolean repaint = true;
 
         if (src == actionComboBox) {
             App.controlCurrentState = actionComboBox.getSelectedIndex();
-        } else if (App.controlCurrentState == 0 && src == createFlockButton) {
+        } else if (App.controlCurrentState == CREATE_FLOCK_INDEX && src == createFlockButton) {
             String name = createFlockNameField.getText();
             int number = (int) createFlockNumberField.getValue();
             Colors color = Colors.values()[createFlockColorComboBox.getSelectedIndex()];
-            App.addFlock(name, number, color);
-        } else if (App.controlCurrentState == 1) {
+            int type = createFlockTypeComboBox.getSelectedIndex();
+            App.addFlock(name, number, color, type);
+        } else if (App.controlCurrentState == UPDATE_FLOCK_INDEX) {
             Flock currentFlock = App.getCurrentFlock();
 
             if (src == flocksComboBox) {
@@ -291,6 +321,8 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
             } else if (src == updateFlockColorComboBox) {
                 Colors color = Colors.values()[updateFlockColorComboBox.getSelectedIndex()];
                 currentFlock.setColors(color);
+            } else if (src == updateFlockTypeComboBox) {
+                currentFlock.setType(updateFlockTypeComboBox.getSelectedIndex());
             } else if (src == updateFlockNumberField) {
                 int nbBoids = (int) updateFlockNumberField.getValue();
                 if (nbBoids >= 0 && nbBoids <= App.MAX_BOIDS_PER_FLOCK) {
@@ -320,9 +352,16 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
             } else if (src == intoleranceSlider) {
                 currentFlock.setIntoleranceCoeff(intoleranceSlider.getValue() / 100.);
             }
+        } else if (App.controlCurrentState == ADD_OBSTACLE_INDEX) {
+
+            Point location = ((MouseEvent) e).getPoint();;
+            int size = (int) obstacleSizeField.getValue();
+            Colors color = Colors.values()[obstacleColorComboBox.getSelectedIndex()];
+            App.addObstacle(new Obstacle(new Vector2D(location.x, location.y), size, color));
+            repaint = false;
         }
 
-        if (!(src instanceof JSlider)) App.repaintControls();
+        if (!(src instanceof JSlider) && repaint) App.repaintControls();
     }
 
     @Override

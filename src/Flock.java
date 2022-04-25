@@ -2,7 +2,6 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class Flock {
-
     private ArrayList<Boid> boids;
 
     private double cohesionCoeff = 0.002;
@@ -18,15 +17,16 @@ public class Flock {
     private String name;
     private Colors colors;
 
-    public boolean isPredator;
+    // type = 0 si proie et 1 si prédateur
+    private int type;
 
     public boolean displayViewRange = false;
     public boolean displayTrails = false;
 
-    public Flock(String name, int number, boolean isPredator, Colors colors) {
-        this.isPredator = isPredator;
+    public Flock(String name, int number, Colors colors, int type) {
         this.name = name;
         this.colors = colors;
+        this.type = type;
         this.boids = new ArrayList<>(number);
         addBoids(number);
     }
@@ -95,6 +95,10 @@ public class Flock {
         return colors;
     }
 
+    public int getType() {
+        return type;
+    }
+
     public void setCohesionCoeff(double coeff) {
         cohesionCoeff = Math.min(0.01, Math.max(0, coeff));
     }
@@ -129,6 +133,13 @@ public class Flock {
 
     public void setColors(Colors colors) {
         this.colors = colors;
+    }
+
+    public void setType(int type) {
+        System.out.println(type);
+        if (type == App.TYPE_PREY || type == App.TYPE_PREDATOR) {
+            this.type = type;
+        }
     }
 
     public void updateBoidNumber(int number) {

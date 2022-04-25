@@ -1,18 +1,15 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
-public class SimulationView extends JPanel implements MouseListener {
+public class SimulationView extends JPanel {
 
     public SimulationView(int x, int y, int width, int height) {
         setLayout(null);
         setBounds(x, y, width, height);
         setBackground(new Color(174, 204, 234));
-        addMouseListener(this);
 
-        App.addFlock("Merles", 100, Colors.RED);
-        App.addPredator("Faucon", 1, Colors.BLACK);
+        App.addFlock("Merles", 100, Colors.RED, App.TYPE_PREY);
+        App.addFlock("Faucon", 1, Colors.BLACK, App.TYPE_PREDATOR);
     }
 
     @Override
@@ -30,34 +27,5 @@ public class SimulationView extends JPanel implements MouseListener {
         for (Flock flock : App.flocks) {
             flock.drawBoids(g2D);
         }
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-        if (App.controlCurrentState == 1) {
-            Flock currentFlock = App.getCurrentFlock();
-
-            Point location = e.getPoint();
-            if (currentFlock.getBoidsNumber() < App.MAX_BOIDS_PER_FLOCK) {
-                currentFlock.addBoidAt(location.x, location.y);
-            }
-            App.repaintControls();
-        }
-    }
-
-    @Override
-    public void mouseClicked(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
     }
 }
