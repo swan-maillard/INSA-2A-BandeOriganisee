@@ -157,7 +157,7 @@ public class Boid {
         }
         if (nbPreys > 0) {
             preysFlockCenter.divide(nbPreys);
-            huntingForce.add(Vector2D.subtract(preysFlockCenter, position)).multiply(flock.getHuntingCoeff());
+            huntingForce.add(Vector2D.subtract(preysFlockCenter, position));
         }
         forces.add(huntingForce);
     }
@@ -219,7 +219,7 @@ public class Boid {
     }
 
     private void computeWallAvoidanceForce() {
-        double forceIntensity = 3;
+        double forceIntensity = Math.max(1, velocity.norm()/App.BOIDS_MIN_SPEED);
         if (position.x - REPULSE_RANGE <= 150) {
             forces.add(new Vector2D(forceIntensity, 0));
         } else if (position.x + REPULSE_RANGE >= AppView.SIMULATION_PANEL_WIDTH - 150) {
@@ -246,7 +246,23 @@ public class Boid {
             velocity.scaleNorm(App.BOIDS_MIN_SPEED);
         }
 
+        preventLeavingWindow();
+
         position.add(velocity);
+    }
+
+    private void preventLeavingWindow() {
+        if (position.x <= 0) {
+            velocity = new Vector2D(flock.getSpeedLimit(), 0);
+        } else if (position.x >= AppView.SIMULATION_PANEL_WIDTH) {
+            velocity = new Vector2D(-flock.getSpeedLimit(), 0);
+        }
+
+        if (position.y <= 0) {
+            velocity = new Vector2D(0, flock.getSpeedLimit());
+        } else if (position.y >= AppView.HEIGHT) {
+            velocity = new Vector2D(0, -flock.getSpeedLimit());
+        }
     }
 
     public void draw(Graphics2D g) {
@@ -275,8 +291,10 @@ public class Boid {
         double directionAngle = Math.atan2(velocity.y, velocity.x);
         g.rotate(directionAngle);
 
-        g.setColor(flock.getColors().getColor());
+        g.setColor(flock.getPrimaryColor());
         g.fill(boidShape);
+        g.setColor(flock.getSecondaryColor());
+        g.draw(boidShape);
 
         g.setTransform(initState);
     }
@@ -303,7 +321,7 @@ public class Boid {
             Vector2D currentTrail = trails.get(i);
             Vector2D nextTrack = (i < trails.size() - 1) ? trails.get(i + 1) : position;
             int alpha = i * 255 / trails.size();
-            Color colorTrail = flock.getColors().getColor().darker();
+            Color colorTrail = flock.getSecondaryColor();
             g.setColor(new Color(colorTrail.getRed(), colorTrail.getGreen(), colorTrail.getBlue(), alpha));
             g.draw(new Line2D.Double(currentTrail.x, currentTrail.y, nextTrack.x, nextTrack.y));
         }

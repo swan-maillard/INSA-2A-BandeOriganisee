@@ -8,8 +8,6 @@ public class Flock {
     private double separationCoeff = .05;
     private double alignementCoeff = .05;
     private double intoleranceCoeff = .05;
-    private double escapeCoeff = 1;
-    private double huntingCoeff = 1;
 
     private int viewRange = 100;
     private double speedLimit = 10;
@@ -17,7 +15,6 @@ public class Flock {
     private String name;
     private Colors colors;
 
-    // type = 0 si proie et 1 si prédateur
     private int type;
 
     public boolean displayViewRange = false;
@@ -71,14 +68,6 @@ public class Flock {
         return intoleranceCoeff;
     }
 
-    public double getEscapeCoeff() {
-        return escapeCoeff;
-    }
-
-    public double getHuntingCoeff() {
-        return huntingCoeff;
-    }
-
     public int getViewRange() {
         return viewRange;
     }
@@ -93,6 +82,14 @@ public class Flock {
 
     public Colors getColors() {
         return colors;
+    }
+
+    public Color getPrimaryColor() {
+        return colors.getPrimaryColor();
+    }
+
+    public Color getSecondaryColor() {
+        return colors.getSecondaryColor();
     }
 
     public int getType() {
@@ -113,14 +110,6 @@ public class Flock {
 
     public void setIntoleranceCoeff(double coeff) {
         intoleranceCoeff = Math.min(0.1, Math.max(0, coeff));
-    }
-
-    public void setHuntingCoeff(double coeff) {
-        huntingCoeff = Math.min(0.1, Math.max(0, coeff));
-    }
-
-    public void setEscapeCoeff(double coeff) {
-        escapeCoeff = Math.min(0.1, Math.max(0, coeff));
     }
 
     public void setViewRange(int viewRange) {

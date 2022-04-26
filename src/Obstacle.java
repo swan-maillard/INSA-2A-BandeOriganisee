@@ -12,11 +12,11 @@ public class Obstacle {
         this.position = position;
         this.radius = radius;
         this.color = color;
-        avoidanceRadius = radius + radius / 2;
+        avoidanceRadius = 2*radius;
     }
 
     public void draw(Graphics2D g) {
-        g.setColor(color.getColor());
+        g.setColor(color.getPrimaryColor());
         g.fill(new Ellipse2D.Double(position.x - radius, position.y - radius, 2 * radius, 2 * radius));
     }
 
