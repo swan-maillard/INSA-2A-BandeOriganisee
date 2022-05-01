@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EventObject;
 
 public class ControlsView extends JPanel implements ActionListener, ChangeListener {
@@ -15,7 +16,7 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
     public static final int ADD_OBSTACLE_INDEX = 2;
 
     private static final String[] controlsActions = new String[]{"Créer une espèce", "Modifier une espèce", "Ajouter un obstacle"};
-    private int[] controlsActionsDisplayed;
+    private Integer[] controlsActionsDisplayed;
 
     private JComboBox<String> flocksComboBox;
     private JComboBox<String> actionComboBox;
@@ -58,11 +59,11 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
 
         ArrayList<String> actionItems = new ArrayList<>();
         if (App.flocksSize() == 0) {
-            controlsActionsDisplayed = new int[]{CREATE_FLOCK_INDEX, ADD_OBSTACLE_INDEX}; // Créer espèce et ajouter obstacle
-        } else if (App.flocksSize() == 5) {
-            controlsActionsDisplayed = new int[]{CREATE_FLOCK_INDEX, ADD_OBSTACLE_INDEX}; // Modifier espèce et ajouter obstacle
+            controlsActionsDisplayed = new Integer[]{CREATE_FLOCK_INDEX, ADD_OBSTACLE_INDEX}; // Créer espèce et ajouter obstacle
+        } else if (App.flocksSize() >= App.MAX_FLOCKS) {
+            controlsActionsDisplayed = new Integer[]{UPDATE_FLOCK_INDEX, ADD_OBSTACLE_INDEX}; // Modifier espèce et ajouter obstacle
         } else {
-            controlsActionsDisplayed = new int[]{CREATE_FLOCK_INDEX, UPDATE_FLOCK_INDEX, ADD_OBSTACLE_INDEX}; // Créer espèce, modifier espèce et ajouter obstacle
+            controlsActionsDisplayed = new Integer[]{CREATE_FLOCK_INDEX, UPDATE_FLOCK_INDEX, ADD_OBSTACLE_INDEX}; // Créer espèce, modifier espèce et ajouter obstacle
         }
 
         for (int actionIndex : controlsActionsDisplayed) {
@@ -71,7 +72,7 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
 
         actionComboBox = new JComboBox<>();
         actionComboBox.setModel(new DefaultComboBoxModel<>(actionItems.toArray(new String[0])));
-        actionComboBox.setSelectedIndex(App.controlCurrentState);
+        actionComboBox.setSelectedIndex(Arrays.asList(controlsActionsDisplayed).indexOf(App.controlCurrentState));
         actionComboBox.setBounds(20, 40, settingsWidth, 20);
         actionComboBox.addActionListener(this);
         this.add(actionComboBox);
@@ -311,7 +312,8 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
         boolean repaint = true;
 
         if (src == actionComboBox) {
-            App.controlCurrentState = actionComboBox.getSelectedIndex();
+            System.out.println(actionComboBox.getSelectedIndex());
+            App.controlCurrentState = controlsActionsDisplayed[actionComboBox.getSelectedIndex()];
         } else if (App.controlCurrentState == CREATE_FLOCK_INDEX && src == createFlockButton) {
             String name = createFlockNameField.getText();
             int number = (int) createFlockNumberField.getValue();

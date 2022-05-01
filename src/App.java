@@ -5,6 +5,7 @@ import java.util.ArrayList;
 public class App {
 
     public static final int TIMER_DELAY = 50;
+    public static final int MAX_FLOCKS = 5;
     public static final int MAX_BOIDS_PER_FLOCK = 100;
     public static final int BOIDS_MIN_SPEED = 5;
     public static final int BOIDS_MAX_SPEED = 15;
@@ -36,10 +37,10 @@ public class App {
     }
 
     public static void addFlock(String name, int number, Colors colors, int type) {
-        if (!name.equals("")) {
+        if (!name.equals("") && flocksSize() < MAX_FLOCKS) {
             number = Math.min(MAX_BOIDS_PER_FLOCK, Math.max(0, number));
             flocks.add(new Flock(name, number, colors, type));
-            controlCurrentState = (flocksSize() < 5 ? 1 : 0);
+            controlCurrentState = 1;
             controlCurrentFlockIndex = Math.max(0, flocksSize() - 1);
         }
     }
