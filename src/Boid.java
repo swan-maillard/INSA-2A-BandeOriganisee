@@ -268,9 +268,9 @@ public class Boid {
     public void draw(Graphics2D g) {
         computeForces();
 
+        if (flock.displayTrails) drawTrails(g);
         drawBoid(g);
         if (flock.displayViewRange) drawViewRange(g);
-        if (flock.displayTrails) drawTrails(g);
     }
 
     private void drawBoid(Graphics2D g) {

@@ -19,5 +19,4 @@ public class Obstacle {
         g.setColor(color.getPrimaryColor());
         g.fill(new Ellipse2D.Double(position.x - radius, position.y - radius, 2 * radius, 2 * radius));
     }
-
 }

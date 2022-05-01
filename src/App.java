@@ -62,6 +62,10 @@ public class App {
         obstacles.add(obstacle);
     }
 
+    public static void removeObstacles() {
+        obstacles.clear();
+    }
+
     public static int flocksSize() {
         return flocks.size();
     }
@@ -81,5 +85,4 @@ public class App {
     public static void main(String[] args) {
         App.run();
     }
-
 }
