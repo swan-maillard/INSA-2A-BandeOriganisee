@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EventObject;
 
+/**
+ *
+ */
 public class ControlsView extends JPanel implements ActionListener, ChangeListener {
 
     public static final int CREATE_FLOCK_INDEX = 0;
@@ -45,6 +48,12 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
     private JComboBox<String> obstacleColorComboBox;
     private JButton deleteObstaclesButton;
 
+    /**
+     * @param x
+     * @param y
+     * @param width
+     * @param height
+     */
     public ControlsView(int x, int y, int width, int height) {
         this.setLayout(null);
         this.setBounds(x, y, width, height);
@@ -90,6 +99,9 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
         }
     }
 
+    /**
+     * @return
+     */
     private JPanel createFlockPanel() {
         JPanel createFlockPanel = new JPanel();
         createFlockPanel.setLayout(null);
@@ -125,12 +137,12 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
         createFlockPanel.add(createFlockColorComboBox);
 
         JLabel typeLabel = new JLabel("Type");
-        typeLabel.setBounds(20 + 2* width /3, 140, (width - 20) / 3, 20);
+        typeLabel.setBounds(20 + 2 * width / 3, 140, (width - 20) / 3, 20);
         createFlockPanel.add(typeLabel);
 
         createFlockTypeComboBox = new JComboBox<>();
         createFlockTypeComboBox.setModel(new DefaultComboBoxModel<>(new String[]{"Proies", "Prédateurs"}));
-        createFlockTypeComboBox.setBounds(20 + 2* width /3, 160, (width - 20) / 3, 20);
+        createFlockTypeComboBox.setBounds(20 + 2 * width / 3, 160, (width - 20) / 3, 20);
         createFlockPanel.add(createFlockTypeComboBox);
 
         createFlockButton = new JButton("Créer l'espèce");
@@ -141,6 +153,9 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
         return createFlockPanel;
     }
 
+    /**
+     * @return
+     */
     private JPanel updateFlockPanel() {
         JPanel updateFlockPanel = new JPanel();
         updateFlockPanel.setLayout(null);
@@ -185,14 +200,14 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
         updateFlockPanel.add(updateFlockColorComboBox);
 
         JLabel typeLabel = new JLabel("Type");
-        typeLabel.setBounds(20 + 2* width /3, 150, (width - 20) / 3, 20);
+        typeLabel.setBounds(20 + 2 * width / 3, 150, (width - 20) / 3, 20);
         updateFlockPanel.add(typeLabel);
 
         updateFlockTypeComboBox = new JComboBox<>();
         updateFlockTypeComboBox = new JComboBox<>();
         updateFlockTypeComboBox.setModel(new DefaultComboBoxModel<>(new String[]{"Proies", "Prédateurs"}));
         updateFlockTypeComboBox.setSelectedIndex(currentFlock.getType());
-        updateFlockTypeComboBox.setBounds(20 + 2* width /3, 170, (width - 20) / 3, 20);
+        updateFlockTypeComboBox.setBounds(20 + 2 * width / 3, 170, (width - 20) / 3, 20);
         updateFlockTypeComboBox.addActionListener(this);
         updateFlockPanel.add(updateFlockTypeComboBox);
 
@@ -273,6 +288,9 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
         return updateFlockPanel;
     }
 
+    /**
+     * @return
+     */
     private JPanel createObstaclePanel() {
         JPanel createObstaclePanel = new JPanel();
         createObstaclePanel.setLayout(null);
@@ -307,6 +325,9 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
         return createObstaclePanel;
     }
 
+    /**
+     * @param e
+     */
     public void doAction(EventObject e) {
         Object src = e.getSource();
         boolean repaint = true;
@@ -365,7 +386,7 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
             } else if (e instanceof MouseEvent) {
                 Point location = ((MouseEvent) e).getPoint();
                 int size = (int) obstacleSizeField.getValue();
-                Colors color = Colors.values()[obstacleColorComboBox.getSelectedIndex()];
+                Color color = Colors.values()[obstacleColorComboBox.getSelectedIndex()].getPrimaryColor();
                 App.addObstacle(new Obstacle(new Vector2D(location.x, location.y), size, color));
             }
             repaint = false;

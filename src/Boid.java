@@ -2,28 +2,56 @@ import java.awt.*;
 import java.awt.geom.*;
 import java.util.ArrayList;
 
+/**
+ * Un boid représente un individu faisant partie d'une espèce
+ * Il suit des règles lui appliquant des forces en fonction des boids environnants
+ */
 public class Boid {
 
-    private final int MAX_TRAILS = 50;
+    // Taille du boid
     private final double BOID_SIZE = 10;
+    // Angle mort de son champ de vision (en degré)
     private final double DEAD_ANGLE = 45;
+    // Rayon de répulsion
     private final double REPULSE_RANGE = 20;
+    // Nombre de traces maximales (le boid laisse des traces derrière lui)
+    private final int MAX_TRAILS = 50;
 
+
+    // Vecteurs position, vitesse et forces
     private Vector2D position;
     private Vector2D velocity;
     private Vector2D forces;
+
+    // Traces laissées par le boid
     private ArrayList<Vector2D> trails;
+
+    // Boids voisins d'une même espèce
     private ArrayList<Boid> strangerNeighbours;
+    // Boids voisins d'une espèce différente
     private ArrayList<Boid> flockNeighbours;
 
+    // Espèce à laquelle le boid fait partie
     private Flock flock;
 
 
+    /**
+     * Constructeur
+     *
+     * @param flock Espèce du boid
+     */
     public Boid(Flock flock) {
         this(flock, 0, 0);
-        setRandomLocation();
+        setRandomPosition();
     }
 
+    /**
+     * Constructeur
+     *
+     * @param flock Espèce du boid
+     * @param x     Position x du boid
+     * @param y     Position y du boid
+     */
     public Boid(Flock flock, double x, double y) {
         this.flock = flock;
         position = new Vector2D(x, y);
@@ -32,20 +60,29 @@ public class Boid {
         trails = new ArrayList<>(MAX_TRAILS);
     }
 
-    public void setRandomLocation() {
+    /**
+     * Définit une position aléatoire au boid
+     */
+    public void setRandomPosition() {
         position = new Vector2D(Math.random() * AppView.SIMULATION_PANEL_WIDTH, Math.random() * AppView.HEIGHT);
     }
 
+    /**
+     * Définit une vitesse aléatoire au boid
+     */
     public void setRandomVelocity() {
         do {
             velocity = new Vector2D(Math.random() * 2 * flock.getSpeedLimit() - flock.getSpeedLimit(), Math.random() * 2 * flock.getSpeedLimit() - flock.getSpeedLimit());
         } while (velocity.norm() < App.BOIDS_MIN_SPEED);
     }
 
+    /**
+     * Trouve les voisins du boid
+     * Un boid est considéré comme voisin s'il se trouve dans son champ de vision
+     */
     private void findNeighbours() {
         flockNeighbours = new ArrayList<>();
         strangerNeighbours = new ArrayList<>();
-
 
         for (Flock fl : App.flocks) {
             for (Boid boid : fl.getBoids()) {
@@ -55,8 +92,10 @@ public class Boid {
                 double angleBetweenBoids = Math.abs(Math.atan2(vectorBetweenBoids.y, vectorBetweenBoids.x));
                 double deadAngleRadian = Math.PI * DEAD_ANGLE / 180;
 
+                // Calcule si le boid se trouve dans son angle mort
                 boolean isBoidInDeadAngle = (angleBetweenBoids - angleBoid >= Math.PI - deadAngleRadian / 2 && angleBetweenBoids - angleBoid <= Math.PI + deadAngleRadian / 2);
 
+                // Si le boid est dans le rayon du champ de vision et pas dans l'angle mort, c'est un voisin
                 if (boid != this && vectorBetweenBoids.norm() <= flock.getViewRange() && !isBoidInDeadAngle) {
                     if (fl == this.flock) {
                         flockNeighbours.add(boid);
@@ -68,6 +107,9 @@ public class Boid {
         }
     }
 
+    /**
+     * Calcule les forces à appliquer à chaque instant
+     */
     private void computeForces() {
         forces.multiply(0);
 
@@ -78,6 +120,8 @@ public class Boid {
         computeAlignementForce();
         computeIntoleranceForce();
 
+        // Si le boid est un prédateur on calcule une force de chasse
+        // Sinon so le boid est une proie on calcule une force de fuite
         if (flock.getType() == App.TYPE_PREDATOR) {
             computeHuntingForce();
         } else {
@@ -87,9 +131,14 @@ public class Boid {
         computeObstacleAvoidanceForce();
         computeWallAvoidanceForce();
 
+        // On applique les forces
         applyForces();
     }
 
+    /**
+     * Calcule la force de cohésion
+     * Cette force est dirigée vers le centre local des boids voisins
+     */
     private void computeCohesionForce() {
         Vector2D cohesionForce = new Vector2D();
         Vector2D flockCenter = new Vector2D();
@@ -104,6 +153,10 @@ public class Boid {
         forces.add(cohesionForce);
     }
 
+    /**
+     * Calcule la force d'intolérance
+     * Cette force s'oppose aux boids voisins d'une espèce différente
+     */
     private void computeIntoleranceForce() {
         Vector2D intoleranceForce = new Vector2D();
 
@@ -118,6 +171,10 @@ public class Boid {
         forces.add(intoleranceForce);
     }
 
+    /**
+     * Calcule la force de séparation
+     * Cette force s'oppose à un boid s'il est dans le champ de répulsion
+     */
     private void computeSeparationForce() {
         Vector2D separationForce = new Vector2D();
 
@@ -132,6 +189,10 @@ public class Boid {
         forces.add(separationForce);
     }
 
+    /**
+     * Calcule la force d'alignement
+     * Cette force s'aligne avec les vitesses moyennes des boids voisins
+     */
     private void computeAlignementForce() {
         Vector2D alignmentForce = new Vector2D();
         for (Boid boid : flockNeighbours) {
@@ -144,6 +205,10 @@ public class Boid {
         forces.add(alignmentForce);
     }
 
+    /**
+     * Calcule la force de chasse
+     * Cette force est dirigée vers le centre local des voisins de type proie
+     */
     private void computeHuntingForce() {
         Vector2D huntingForce = new Vector2D();
 
@@ -162,6 +227,10 @@ public class Boid {
         forces.add(huntingForce);
     }
 
+    /**
+     * Calcule la force de fuite
+     * Cette force est dirigée à l'opposé du boid prédateur voisin le plus proche
+     */
     private void computeFleeingForce() {
         Vector2D fleeingForce = new Vector2D();
 
@@ -169,7 +238,7 @@ public class Boid {
         for (Boid boid : strangerNeighbours) {
             if (boid.flock.getType() == App.TYPE_PREDATOR) {
                 double boidDistance = Vector2D.subtract(boid.position, this.position).norm();
-                if (closestPredator == null ||  boidDistance < Vector2D.subtract(closestPredator.position, this.position).norm()) {
+                if (closestPredator == null || boidDistance < Vector2D.subtract(closestPredator.position, this.position).norm()) {
                     closestPredator = boid;
                 }
             }
@@ -181,6 +250,9 @@ public class Boid {
         forces.add(fleeingForce);
     }
 
+    /**
+     * Calcule la force d'évitement des obstacles
+     */
     private void computeObstacleAvoidanceForce() {
         for (Obstacle obstacle : App.obstacles) {
             if (willCollideObstacle(obstacle)) {
@@ -210,6 +282,12 @@ public class Boid {
         }
     }
 
+    /**
+     * Renvoie si le boid risque de heurter un obstacle s'il ne dévie pas sa trajectoire
+     *
+     * @param obstacle
+     * @return si le boid risque de heurter un obstacle
+     */
     private boolean willCollideObstacle(Obstacle obstacle) {
         Vector2D BO = Vector2D.subtract(obstacle.position, this.position); // Vecteur entre le boid et le centre de l'obstacle
         double projection = Vector2D.scalarProduct(BO, velocity.normalized()); // Projection de BO sur la direction du boid
@@ -218,8 +296,11 @@ public class Boid {
         return (BO.norm() <= REPULSE_RANGE + obstacle.avoidanceRadius && distanceBoidObstacle < obstacle.avoidanceRadius && projection >= 0);
     }
 
+    /**
+     * Calcule la force d'évitement des bords de l'écran
+     */
     private void computeWallAvoidanceForce() {
-        double forceIntensity = Math.max(1, velocity.norm()/App.BOIDS_MIN_SPEED);
+        double forceIntensity = Math.max(1, velocity.norm() / App.BOIDS_MIN_SPEED);
         if (position.x - REPULSE_RANGE <= 150) {
             forces.add(new Vector2D(forceIntensity, 0));
         } else if (position.x + REPULSE_RANGE >= AppView.SIMULATION_PANEL_WIDTH - 150) {
@@ -233,6 +314,11 @@ public class Boid {
         }
     }
 
+    /**
+     * Applique les forces au boid
+     * Modifie la vitesse du boid
+     * Modifie la position du boid
+     */
     private void applyForces() {
         if (trails.size() > MAX_TRAILS) {
             trails.remove(0);
@@ -240,17 +326,23 @@ public class Boid {
         trails.add(new Vector2D(position));
 
         velocity.add(forces);
+
+        // On limite la vitesse pour ne pas qu'elle soit contenue entre un intervalle
         if (velocity.norm() > flock.getSpeedLimit()) {
             velocity.scaleNorm(flock.getSpeedLimit());
         } else if (velocity.norm() < App.BOIDS_MIN_SPEED) {
             velocity.scaleNorm(App.BOIDS_MIN_SPEED);
         }
 
+        // Empêche le boid de sortir de la fenêtre
         preventLeavingWindow();
 
         position.add(velocity);
     }
 
+    /**
+     * Empêche les boids de sortir de la fenêtre
+     */
     private void preventLeavingWindow() {
         if (position.x <= 0) {
             velocity = new Vector2D(flock.getSpeedLimit(), 0);
@@ -265,7 +357,12 @@ public class Boid {
         }
     }
 
-    public void draw(Graphics2D g) {
+    /**
+     * Rafraichit le boid (Recalcule sa position et le redessine)
+     *
+     * @param g Graphics2D
+     */
+    public void refresh(Graphics2D g) {
         computeForces();
 
         if (flock.displayTrails) drawTrails(g);
@@ -273,6 +370,11 @@ public class Boid {
         if (flock.displayViewRange) drawViewRange(g);
     }
 
+    /**
+     * Dessine le boid
+     *
+     * @param g Graphics2D
+     */
     private void drawBoid(Graphics2D g) {
         double boidAngle = Math.PI / 4;
 
@@ -299,6 +401,11 @@ public class Boid {
         g.setTransform(initState);
     }
 
+    /**
+     * Dessine le champ de vision
+     *
+     * @param g Graphics2D
+     */
     private void drawViewRange(Graphics2D g) {
         double viewRange = flock.getViewRange();
 
@@ -316,6 +423,11 @@ public class Boid {
         g.setTransform(initState);
     }
 
+    /**
+     * Dessine les traces
+     *
+     * @param g Graphics2D
+     */
     public void drawTrails(Graphics2D g) {
         for (int i = 0; i < trails.size(); i++) {
             Vector2D currentTrail = trails.get(i);
@@ -327,6 +439,9 @@ public class Boid {
         }
     }
 
+    /**
+     * Supprime les traces
+     */
     public void clearTrails() {
         trails.clear();
     }
