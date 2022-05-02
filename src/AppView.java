@@ -80,7 +80,7 @@ public class AppView extends JFrame implements MouseListener {
     public void mousePressed(MouseEvent e) {
         // Le joueur a cliqué sur l'écran de simulation
         // Soit on ajoute un boid, soit on ajoute un obstacle
-        if (App.controlCurrentState == App.UPDATE_FLOCK_INDEX) {
+        if (App.controlCurrentState == ControlsView.UPDATE_FLOCK_INDEX) {
             Flock currentFlock = App.getCurrentFlock();
 
             Point location = e.getPoint();
@@ -88,7 +88,7 @@ public class AppView extends JFrame implements MouseListener {
                 currentFlock.addBoidAt(location.x, location.y);
             }
             App.repaintControls();
-        } else if (App.controlCurrentState == App.ADD_OBSTACLE_INDEX) {
+        } else if (App.controlCurrentState == ControlsView.ADD_OBSTACLE_INDEX) {
             // doAction va rajouter un obstacle
             ((ControlsView) controlsPanel).doAction(e);
         }

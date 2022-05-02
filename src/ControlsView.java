@@ -10,25 +10,19 @@ import java.util.Arrays;
 import java.util.EventObject;
 
 /**
- * JPanel du panneau de contrôle
+ *
  */
 public class ControlsView extends JPanel implements ActionListener, ChangeListener {
 
-    // Liste déroulante des différents menus
-    private JComboBox<String> actionComboBox;
+    public static final int CREATE_FLOCK_INDEX = 0;
+    public static final int UPDATE_FLOCK_INDEX = 1;
+    public static final int ADD_OBSTACLE_INDEX = 2;
 
-    // Menu création d'espèce
-    private JTextField createFlockNameField;
-    private JSpinner createFlockNumberField;
-    private JComboBox<String> createFlockColorComboBox;
-    private JComboBox<String> createFlockTypeComboBox;
-    private JButton createFlockButton;
+    private static final String[] controlsActions = new String[]{"Créer une espèce", "Modifier une espèce", "Ajouter un obstacle"};
+    private Integer[] controlsActionsDisplayed;
 
-    // Menu modification d'une espèce
     private JComboBox<String> flocksComboBox;
-    private JSpinner updateFlockNumberField;
-    private JComboBox<String> updateFlockColorComboBox;
-    private JComboBox<String> updateFlockTypeComboBox;
+    private JComboBox<String> actionComboBox;
     private JSlider cohesionSlider;
     private JSlider alignmentSlider;
     private JSlider separationSlider;
@@ -37,66 +31,76 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
     private JSlider viewRangeSlider;
     private JCheckBox trailsCheckBox;
     private JCheckBox viewRangeCheckBox;
+
+    private JTextField createFlockNameField;
+    private JSpinner createFlockNumberField;
+    private JComboBox<String> createFlockColorComboBox;
+    private JComboBox<String> createFlockTypeComboBox;
+    private JButton createFlockButton;
+
+    private JSpinner updateFlockNumberField;
+    private JComboBox<String> updateFlockColorComboBox;
+    private JComboBox<String> updateFlockTypeComboBox;
     private JButton resetFlockButton;
     private JButton deleteFlockButton;
 
-    // Menu ajout d'obstacles
     private JSpinner obstacleSizeField;
     private JComboBox<String> obstacleColorComboBox;
     private JButton deleteObstaclesButton;
 
     /**
-     * Constructeur
-     *
-     * @param x position x
-     * @param y position y
-     * @param w largeur
-     * @param h hauteur
+     * @param x
+     * @param y
+     * @param width
+     * @param height
      */
-    public ControlsView(int x, int y, int w, int h) {
+    public ControlsView(int x, int y, int width, int height) {
         this.setLayout(null);
-        this.setBounds(x, y, w, h);
+        this.setBounds(x, y, width, height);
         this.setBackground(Color.WHITE);
 
-        int width = getWidth() - 40;
+        int settingsWidth = getWidth() - 40;
 
         JLabel actionLabel = new JLabel("Action");
-        actionLabel.setBounds(20, 20, width, 20);
+        actionLabel.setBounds(20, 20, settingsWidth, 20);
         this.add(actionLabel);
 
-        // On récupert les menus (actions) disponibles
-        App.updateControlsMenusDisplays();
+
         ArrayList<String> actionItems = new ArrayList<>();
-        for (int actionIndex : App.controlsActionsDisplayed) {
-            actionItems.add(App.CONTROLS_ACTIONS[actionIndex]);
+        if (App.flocksSize() == 0) {
+            controlsActionsDisplayed = new Integer[]{CREATE_FLOCK_INDEX, ADD_OBSTACLE_INDEX}; // Créer espèce et ajouter obstacle
+        } else if (App.flocksSize() >= App.MAX_FLOCKS) {
+            controlsActionsDisplayed = new Integer[]{UPDATE_FLOCK_INDEX, ADD_OBSTACLE_INDEX}; // Modifier espèce et ajouter obstacle
+        } else {
+            controlsActionsDisplayed = new Integer[]{CREATE_FLOCK_INDEX, UPDATE_FLOCK_INDEX, ADD_OBSTACLE_INDEX}; // Créer espèce, modifier espèce et ajouter obstacle
         }
 
-        // Liste déroulante des menus disponibles
+        for (int actionIndex : controlsActionsDisplayed) {
+            actionItems.add(controlsActions[actionIndex]);
+        }
+
         actionComboBox = new JComboBox<>();
         actionComboBox.setModel(new DefaultComboBoxModel<>(actionItems.toArray(new String[0])));
-        actionComboBox.setSelectedIndex(Arrays.asList(App.controlsActionsDisplayed).indexOf(App.controlCurrentState));
-        actionComboBox.setBounds(20, 40, width, 20);
+        actionComboBox.setSelectedIndex(Arrays.asList(controlsActionsDisplayed).indexOf(App.controlCurrentState));
+        actionComboBox.setBounds(20, 40, settingsWidth, 20);
         actionComboBox.addActionListener(this);
         this.add(actionComboBox);
 
-        // On ajoute le JPanel du menu selectionné
         switch (App.controlCurrentState) {
-            case App.CREATE_FLOCK_INDEX:
+            case CREATE_FLOCK_INDEX:
                 this.add(createFlockPanel());
                 break;
-            case App.UPDATE_FLOCK_INDEX:
+            case UPDATE_FLOCK_INDEX:
                 this.add(updateFlockPanel());
                 break;
-            case App.ADD_OBSTACLE_INDEX:
+            case ADD_OBSTACLE_INDEX:
                 this.add(createObstaclePanel());
                 break;
         }
     }
 
     /**
-     * Menu de création d'une espèce
-     *
-     * @return JPanel du menu
+     * @return
      */
     private JPanel createFlockPanel() {
         JPanel createFlockPanel = new JPanel();
@@ -106,7 +110,6 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
 
         int width = getWidth() - 40;
 
-        // Nom de l'espèce
         JLabel nameLabel = new JLabel("Nom");
         nameLabel.setBounds(20, 100, width, 20);
         createFlockPanel.add(nameLabel);
@@ -115,7 +118,6 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
         createFlockNameField.setBounds(20, 120, width, 20);
         createFlockPanel.add(createFlockNameField);
 
-        // Nombre de boids
         JLabel numberLabel = new JLabel("Nombre");
         numberLabel.setBounds(20, 140, (width - 20) / 3, 20);
         createFlockPanel.add(numberLabel);
@@ -125,7 +127,6 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
         createFlockNumberField.setBounds(20, 160, (width - 20) / 3, 20);
         createFlockPanel.add(createFlockNumberField);
 
-        // Couleur de l'espèce
         JLabel colorLabel = new JLabel("Couleur");
         colorLabel.setBounds(20 + width / 3, 140, (width - 20) / 3, 20);
         createFlockPanel.add(colorLabel);
@@ -135,7 +136,6 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
         createFlockColorComboBox.setBounds(20 + width / 3, 160, (width - 20) / 3, 20);
         createFlockPanel.add(createFlockColorComboBox);
 
-        // Type de l'espèce (Proies ou Prédateurs)
         JLabel typeLabel = new JLabel("Type");
         typeLabel.setBounds(20 + 2 * width / 3, 140, (width - 20) / 3, 20);
         createFlockPanel.add(typeLabel);
@@ -145,7 +145,6 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
         createFlockTypeComboBox.setBounds(20 + 2 * width / 3, 160, (width - 20) / 3, 20);
         createFlockPanel.add(createFlockTypeComboBox);
 
-        // Bouton de création de l'espèce
         createFlockButton = new JButton("Créer l'espèce");
         createFlockButton.setBounds(20, 200, width, 20);
         createFlockButton.addActionListener(this);
@@ -155,9 +154,7 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
     }
 
     /**
-     * Menu de modification d'une espèce
-     *
-     * @return JPanel du menu
+     * @return
      */
     private JPanel updateFlockPanel() {
         JPanel updateFlockPanel = new JPanel();
@@ -168,7 +165,6 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
         Flock currentFlock = App.getCurrentFlock();
         int width = getWidth() - 40;
 
-        // Menu déroulant des différentes espèces créées
         JLabel FlockLabel = new JLabel("Espèce");
         FlockLabel.setBounds(20, 80, width, 20);
         updateFlockPanel.add(FlockLabel);
@@ -181,7 +177,6 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
         flocksComboBox.addActionListener(this);
         updateFlockPanel.add(flocksComboBox);
 
-        // Nombre de boids
         JLabel numberLabel = new JLabel("Nombre");
         numberLabel.setBounds(20, 150, (width - 20) / 3, 20);
         updateFlockPanel.add(numberLabel);
@@ -192,7 +187,6 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
         updateFlockNumberField.addChangeListener(this);
         updateFlockPanel.add(updateFlockNumberField);
 
-        // Couleur de l'espèce
         JLabel colorLabel = new JLabel("Couleur");
         colorLabel.setBounds(20 + width / 3, 150, (width - 20) / 3, 20);
         updateFlockPanel.add(colorLabel);
@@ -205,7 +199,6 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
         updateFlockColorComboBox.addActionListener(this);
         updateFlockPanel.add(updateFlockColorComboBox);
 
-        // Type de l'espèce (Proies ou Prédateurs)
         JLabel typeLabel = new JLabel("Type");
         typeLabel.setBounds(20 + 2 * width / 3, 150, (width - 20) / 3, 20);
         updateFlockPanel.add(typeLabel);
@@ -218,7 +211,6 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
         updateFlockTypeComboBox.addActionListener(this);
         updateFlockPanel.add(updateFlockTypeComboBox);
 
-        // Slider pour le coefficient de cohésion
         JLabel cohesionLabel = new JLabel("Cohésion", SwingConstants.CENTER);
         cohesionLabel.setBounds(20, 210, width / 3, 20);
         updateFlockPanel.add(cohesionLabel);
@@ -228,7 +220,6 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
         cohesionSlider.addChangeListener(this);
         updateFlockPanel.add(cohesionSlider);
 
-        // Slider pour le coefficient d'alignement
         JLabel alignmentLabel = new JLabel("Alignement", SwingConstants.CENTER);
         alignmentLabel.setBounds(20 + width / 3, 210, width / 3, 20);
         updateFlockPanel.add(alignmentLabel);
@@ -238,7 +229,6 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
         alignmentSlider.addChangeListener(this);
         updateFlockPanel.add(alignmentSlider);
 
-        // Slider pour le coefficient de séparation
         JLabel separationLabel = new JLabel("Séparation", SwingConstants.CENTER);
         separationLabel.setBounds(20 + 2 * width / 3, 210, width / 3, 20);
         updateFlockPanel.add(separationLabel);
@@ -248,7 +238,6 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
         separationSlider.addChangeListener(this);
         updateFlockPanel.add(separationSlider);
 
-        // Slider pour le coefficient d'intolérance
         JLabel intoleranceLabel = new JLabel("Intolérence", SwingConstants.CENTER);
         intoleranceLabel.setBounds(20, 250, width / 3, 20);
         updateFlockPanel.add(intoleranceLabel);
@@ -258,7 +247,6 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
         intoleranceSlider.addChangeListener(this);
         updateFlockPanel.add(intoleranceSlider);
 
-        // Slider pour la limite de vitesse
         JLabel speedLabel = new JLabel("Vitesse", SwingConstants.CENTER);
         speedLabel.setBounds(20 + width / 3, 250, width / 3, 20);
         updateFlockPanel.add(speedLabel);
@@ -268,7 +256,6 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
         speedSlider.addChangeListener(this);
         updateFlockPanel.add(speedSlider);
 
-        // Slider pour le rayon du champ de vision
         JLabel viewRangeLabel = new JLabel("Vision", SwingConstants.CENTER);
         viewRangeLabel.setBounds(20 + 2 * width / 3, 250, width / 3, 20);
         updateFlockPanel.add(viewRangeLabel);
@@ -278,25 +265,21 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
         viewRangeSlider.addChangeListener(this);
         updateFlockPanel.add(viewRangeSlider);
 
-        // Checkbox pour afficher les traces des boids
         trailsCheckBox = new JCheckBox("Afficher les traces", currentFlock.displayTrails);
         trailsCheckBox.setBounds(20, 310, width / 2, 20);
         trailsCheckBox.addActionListener(this);
         updateFlockPanel.add(trailsCheckBox);
 
-        // Checkbox pour afficher le champ de vision des boids
         viewRangeCheckBox = new JCheckBox("Afficher la vision", currentFlock.displayViewRange);
         viewRangeCheckBox.setBounds(20 + width / 2, 310, width / 2, 20);
         viewRangeCheckBox.addActionListener(this);
         updateFlockPanel.add(viewRangeCheckBox);
 
-        // Bouton pour réinitialiser les positions et vitesses des boids
         resetFlockButton = new JButton("Réinitialiser l'espèce");
         resetFlockButton.setBounds(20, 350, width, 20);
         resetFlockButton.addActionListener(this);
         updateFlockPanel.add(resetFlockButton);
 
-        // Bouton pour supprimer l'espèce
         deleteFlockButton = new JButton("Supprimer l'espèce");
         deleteFlockButton.setBounds(20, 390, width, 20);
         deleteFlockButton.addActionListener(this);
@@ -306,9 +289,7 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
     }
 
     /**
-     * Menu de création d'un obstacle
-     *
-     * @return JPanel du menu
+     * @return
      */
     private JPanel createObstaclePanel() {
         JPanel createObstaclePanel = new JPanel();
@@ -318,7 +299,6 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
 
         int width = getWidth() - 40;
 
-        // Taille de l'obstacle
         JLabel obstacleSizeLabel = new JLabel("Taille");
         obstacleSizeLabel.setBounds(20, 100, width, 20);
         createObstaclePanel.add(obstacleSizeLabel);
@@ -328,7 +308,6 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
         obstacleSizeField.setBounds(20, 120, (width - 20) / 2, 20);
         createObstaclePanel.add(obstacleSizeField);
 
-        // Couleur de l'obstacle
         JLabel colorLabel = new JLabel("Couleur");
         colorLabel.setBounds(30 + width / 2, 100, (width - 20) / 2, 20);
         createObstaclePanel.add(colorLabel);
@@ -338,7 +317,6 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
         obstacleColorComboBox.setBounds(30 + width / 2, 120, (width - 20) / 2, 20);
         createObstaclePanel.add(obstacleColorComboBox);
 
-        // Bouton pour supprimer tous les obstacles
         deleteObstaclesButton = new JButton("Supprimer les obstacles");
         deleteObstaclesButton.setBounds(20, 160, width, 20);
         deleteObstaclesButton.addActionListener(this);
@@ -348,76 +326,64 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
     }
 
     /**
-     * Cette méthode est appelée quand l'utilisateur fait une action
-     *
-     * @param e Évenement
+     * @param e
      */
     public void doAction(EventObject e) {
         Object src = e.getSource();
-
-        // Si repaint est true le panneau de contrôle sera repaint à la fin de l'action
         boolean repaint = true;
 
         if (src == actionComboBox) {
-            // Change le menu selectionné
             System.out.println(actionComboBox.getSelectedIndex());
-            App.controlCurrentState = App.controlsActionsDisplayed[actionComboBox.getSelectedIndex()];
-        } else if (App.controlCurrentState == App.CREATE_FLOCK_INDEX && src == createFlockButton) {
-            // Crée une espèce
+            App.controlCurrentState = controlsActionsDisplayed[actionComboBox.getSelectedIndex()];
+        } else if (App.controlCurrentState == CREATE_FLOCK_INDEX && src == createFlockButton) {
             String name = createFlockNameField.getText();
             int number = (int) createFlockNumberField.getValue();
             Colors color = Colors.values()[createFlockColorComboBox.getSelectedIndex()];
             int type = createFlockTypeComboBox.getSelectedIndex();
             App.addFlock(name, number, color, type);
-        } else if (App.controlCurrentState == App.UPDATE_FLOCK_INDEX) {
-            // L'utilisateur est sur le menu de modification d'une espèce
+        } else if (App.controlCurrentState == UPDATE_FLOCK_INDEX) {
             Flock currentFlock = App.getCurrentFlock();
 
             if (src == flocksComboBox) {
-                App.controlCurrentFlockIndex = flocksComboBox.getSelectedIndex(); // Change l'espèce selectionnée
+                App.controlCurrentFlockIndex = flocksComboBox.getSelectedIndex();
             } else if (src == updateFlockColorComboBox) {
-                Colors color = Colors.values()[updateFlockColorComboBox.getSelectedIndex()]; // Modifie la couleur
+                Colors color = Colors.values()[updateFlockColorComboBox.getSelectedIndex()];
                 currentFlock.setColors(color);
             } else if (src == updateFlockTypeComboBox) {
-                currentFlock.setType(updateFlockTypeComboBox.getSelectedIndex()); // Modifie le type
+                currentFlock.setType(updateFlockTypeComboBox.getSelectedIndex());
             } else if (src == updateFlockNumberField) {
                 int nbBoids = (int) updateFlockNumberField.getValue();
                 if (nbBoids >= 0 && nbBoids <= App.MAX_BOIDS_PER_FLOCK) {
-                    currentFlock.updateBoidNumber(nbBoids); // Modifie le nombre de boids
+                    currentFlock.updateBoidNumber(nbBoids);
                 }
             } else if (src == viewRangeCheckBox) {
-                // Active/Désactive l'affichage du champ de vision
                 currentFlock.displayViewRange = viewRangeCheckBox.isSelected();
             } else if (src == trailsCheckBox) {
-                // Active/Désactive l'affichage des traces
                 currentFlock.displayTrails = trailsCheckBox.isSelected();
                 for (Boid boid : currentFlock.getBoids()) {
                     boid.clearTrails();
                 }
             } else if (src == resetFlockButton) {
-                App.resetFlock(currentFlock); // Réinitialise la position et vitesse des boids
+                App.resetFlock(currentFlock);
             } else if (src == deleteFlockButton) {
-                App.removeFlock(currentFlock); // Supprome l'espèce
+                App.removeFlock(currentFlock);
             } else if (src == viewRangeSlider) {
-                currentFlock.setViewRange(viewRangeSlider.getValue()); // Modifie le rayon du champ de vision
+                currentFlock.setViewRange(viewRangeSlider.getValue());
             } else if (src == speedSlider) {
-                currentFlock.setSpeedLimit(speedSlider.getValue()); // Modifie la limite de vitesse
+                currentFlock.setSpeedLimit(speedSlider.getValue());
             } else if (src == cohesionSlider) {
-                currentFlock.setCohesionCoeff(cohesionSlider.getValue() / 1000.); // Modifie le coefficient de cohésion
+                currentFlock.setCohesionCoeff(cohesionSlider.getValue() / 1000.);
             } else if (src == separationSlider) {
-                currentFlock.setSeparationCoeff(separationSlider.getValue() / 100.); // Modifie le coefficient de séparation
+                currentFlock.setSeparationCoeff(separationSlider.getValue() / 100.);
             } else if (src == alignmentSlider) {
-                currentFlock.setAlignementCoeff(alignmentSlider.getValue() / 100.); // Modifie le coefficient d'alignement
+                currentFlock.setAlignementCoeff(alignmentSlider.getValue() / 100.);
             } else if (src == intoleranceSlider) {
-                currentFlock.setIntoleranceCoeff(intoleranceSlider.getValue() / 100.); // Modifie le coefficient d'intolérance
+                currentFlock.setIntoleranceCoeff(intoleranceSlider.getValue() / 100.);
             }
-        } else if (App.controlCurrentState == App.ADD_OBSTACLE_INDEX) {
-            // L'utilisateur est sur le menu de création d'obstacles
-
+        } else if (App.controlCurrentState == ADD_OBSTACLE_INDEX) {
             if (e.getSource() == deleteObstaclesButton) {
-                App.removeObstacles(); // Supprime tous les obstacles
+                App.removeObstacles();
             } else if (e instanceof MouseEvent) {
-                // Si l'utilisateur a cliqué sur le panneau de simulation, on ajoute un obstacle
                 Point location = ((MouseEvent) e).getPoint();
                 int size = (int) obstacleSizeField.getValue();
                 Color color = Colors.values()[obstacleColorComboBox.getSelectedIndex()].getPrimaryColor();
@@ -426,7 +392,6 @@ public class ControlsView extends JPanel implements ActionListener, ChangeListen
             repaint = false;
         }
 
-        // Si on peut repeindre et que la modification ne vient pas d'un slider, on repaint le panneau de contrôle
         if (!(src instanceof JSlider) && repaint) App.repaintControls();
     }
 
