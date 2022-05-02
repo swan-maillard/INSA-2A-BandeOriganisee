@@ -11,12 +11,12 @@ public class SimulationView extends JPanel {
      *
      * @param x      position x
      * @param y      position y
-     * @param width  longueur
-     * @param height hauteur
+     * @param w  largeur
+     * @param h hauteur
      */
-    public SimulationView(int x, int y, int width, int height) {
+    public SimulationView(int x, int y, int w, int h) {
         setLayout(null);
-        setBounds(x, y, width, height);
+        setBounds(x, y, w, h);
         setBackground(new Color(174, 204, 234));
 
         App.addFlock("Merles", 100, Colors.RED, App.TYPE_PREY);

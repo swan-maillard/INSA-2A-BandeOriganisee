@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.EventObject;
 
 /**
  * Classe principale
@@ -22,13 +23,25 @@ public class App {
     public static final int TYPE_PREY = 0;
     public static final int TYPE_PREDATOR = 1;
 
+
+    // Index des menus du panneau de contrôle
+    public static final int CREATE_FLOCK_INDEX = 0;
+    public static final int UPDATE_FLOCK_INDEX = 1;
+    public static final int ADD_OBSTACLE_INDEX = 2;
+    // Menus du panneau de contrôle
+    public static final String[] CONTROLS_ACTIONS = new String[]{"Créer une espèce", "Modifier une espèce", "Ajouter un obstacle"};
+
+    // Menus affichés du panneau de contrôle
+    public static Integer[] controlsActionsDisplayed;
+    // Index du menu courant dans le panneau de contrôle
+    public static int controlCurrentState = CREATE_FLOCK_INDEX;
+    // Index de l'espèce selectionnée dans le panneau de contrôle
+    public static int controlCurrentFlockIndex = 0;
+
+
     // Liste des flocks (différentes espèces) et des obstacles
     public static ArrayList<Flock> flocks = new ArrayList<>();
     public static ArrayList<Obstacle> obstacles = new ArrayList<>();
-
-    // Variables du panneau de contrôle
-    public static int controlCurrentState = 1;
-    public static int controlCurrentFlockIndex = 0;
 
     // JPanel principal de l'application
     private static AppView appView;
@@ -58,6 +71,19 @@ public class App {
     }
 
     /**
+     * Redéfinit les menus affichés dans le panneau de contrôle
+     */
+    public static void updateControlsMenusDisplays() {
+        if (flocksSize() == 0) {
+            controlsActionsDisplayed = new Integer[]{CREATE_FLOCK_INDEX, ADD_OBSTACLE_INDEX}; // Créer espèce et ajouter obstacle
+        } else if (flocksSize() >= MAX_FLOCKS) {
+            controlsActionsDisplayed = new Integer[]{UPDATE_FLOCK_INDEX, ADD_OBSTACLE_INDEX}; // Modifier espèce et ajouter obstacle
+        } else {
+            controlsActionsDisplayed = new Integer[]{CREATE_FLOCK_INDEX, UPDATE_FLOCK_INDEX, ADD_OBSTACLE_INDEX}; // Créer espèce, modifier espèce et ajouter obstacle
+        }
+    }
+
+    /**
      * Ajoute une espèce à la liste des espèces (flocks)
      *
      * @param name   nom de l'espèce
@@ -70,8 +96,8 @@ public class App {
             number = Math.min(MAX_BOIDS_PER_FLOCK, Math.max(0, number));
             flocks.add(new Flock(name, number, colors, type));
 
-            // On change l'état du panneau de contrôle pour pouvoir modifier cette nouvelle espèce
-            controlCurrentState = ControlsView.UPDATE_FLOCK_INDEX;
+            // On change le menu du panneau de contrôle pour pouvoir modifier cette nouvelle espèce
+            controlCurrentState = UPDATE_FLOCK_INDEX;
             // On définit cette espèce comme espèce courante
             controlCurrentFlockIndex = Math.max(0, flocksSize() - 1);
         }
@@ -101,9 +127,9 @@ public class App {
         // La première espèce devient l'espèce courante
         controlCurrentFlockIndex = 0;
 
-        // S'il n'y a plus de d'espèces, on change l'état du panneau de contrôle pour créer une espèce
+        // S'il n'y a plus de d'espèces, on change le menu du panneau de contrôle pour créer une espèce
         if (flocksSize() == 0) {
-            controlCurrentState = ControlsView.CREATE_FLOCK_INDEX;
+            controlCurrentState = CREATE_FLOCK_INDEX;
         }
     }
 
