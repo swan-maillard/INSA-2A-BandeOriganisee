@@ -283,7 +283,8 @@ public class Boid {
 
     /**
      * Calcule la force d'évitement des obstacles
-     * Explications mathématiques dans le compte rendu
+     * Voir l'article http://www2.cs.uregina.ca/~anima/408/Notes/ControllingGroups/Flocking.htm paragraphe F.(b) pour
+     * comprendre les mathématiques derrière
      */
     private void computeObstacleAvoidanceForce() {
         for (Obstacle obstacle : App.obstacles) {

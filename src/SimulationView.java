@@ -30,7 +30,7 @@ public class SimulationView extends JPanel {
         // On récupère un Graphics2D pour pouvoir accéder à d'autres méthodes
         Graphics2D g2D = (Graphics2D) g;
 
-        // Paramètres pour rendre la simulation plus lisse et naturelle
+        // Paramètres pour rendre l'affichage plus lisse et fluide
         g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2D.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED);
 
