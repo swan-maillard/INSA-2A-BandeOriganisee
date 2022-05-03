@@ -17,8 +17,9 @@ public enum Colors {
 
     /**
      * Constructeur
-     * @param name Nom de la couleur
-     * @param primaryColor Couleur primaire
+     *
+     * @param name           Nom de la couleur
+     * @param primaryColor   Couleur primaire
      * @param secondaryColor Couleur secondaire
      */
     Colors(String name, Color primaryColor, Color secondaryColor) {
@@ -29,6 +30,7 @@ public enum Colors {
 
     /**
      * Renvoie une liste des noms des couleurs
+     *
      * @return la liste des noms des couleurs
      */
     public static String[] getColors() {
@@ -42,6 +44,7 @@ public enum Colors {
 
     /**
      * Renvoie le nom de la couleur
+     *
      * @return le nom de la couleur
      */
     public String getName() {
@@ -50,6 +53,7 @@ public enum Colors {
 
     /**
      * Renvoie la couleur primaire
+     *
      * @return la couleur primaire
      */
     public Color getPrimaryColor() {
@@ -58,6 +62,7 @@ public enum Colors {
 
     /**
      * Renvoie la couleur secondaire
+     *
      * @return la couleur secondaire
      */
     public Color getSecondaryColor() {

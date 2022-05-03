@@ -9,9 +9,9 @@ public class SimulationView extends JPanel {
     /**
      * Constructeur
      *
-     * @param x      position x
-     * @param y      position y
-     * @param w  largeur
+     * @param x position x
+     * @param y position y
+     * @param w largeur
      * @param h hauteur
      */
     public SimulationView(int x, int y, int w, int h) {
@@ -19,8 +19,7 @@ public class SimulationView extends JPanel {
         setBounds(x, y, w, h);
         setBackground(new Color(174, 204, 234));
 
-        App.addFlock("Merles", 100, Colors.RED, App.TYPE_PREY);
-        App.addFlock("Faucon", 1, Colors.BLACK, App.TYPE_PREDATOR);
+        App.addFlock("Hirondelles", 50, Colors.BLUE, App.TYPE_PREY);
     }
 
     @Override
