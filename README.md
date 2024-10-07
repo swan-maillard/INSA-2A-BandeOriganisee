@@ -53,13 +53,13 @@ Voir plus sur les boids : https://fr.wikipedia.org/wiki/Boids
 1. Clonez le dépôt GitHub :
 
    ```bash
-   git clone https://github.com/swan-maillard/BandeOriganisee.git
+   git clone https://github.com/swan-maillard/INSA-2A-BandeOriganisee.git
    ```
 
 2. Accédez au répertoire du projet :
 
    ```bash
-   cd BandeOriganisee
+   cd INSA-2A-BandeOriganisee
    ```
 
 3. Ouvrez le projet dans votre IDE préféré.
