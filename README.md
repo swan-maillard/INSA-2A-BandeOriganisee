@@ -77,6 +77,9 @@ Voir plus sur les boids : https://fr.wikipedia.org/wiki/Boids
 ## Auteurs
 
 - Swan Maillard (maillard.swan@gmail.com)
+- Adam Laalouj (adam.laalouj@insa-lyon.fr)
+- Vincent Sename (vincent.sename@insa-lyon.fr)
+- Imad Touil (imad.touil@insa-lyon.fr)
 
 ## Licence
 
