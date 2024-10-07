@@ -2,85 +2,81 @@
 
 ## Description
 
-Le projet **Bande Organisée** est une implémentation d'un algorithme de simulation de comportements de groupes d'animaux, connu sous le nom de "boids", développé par Craig Reynolds en 1986. 
-Ce programme permet de simuler un groupe d'agent (boids) qui interagissent entre eux selon des règles simples de cohésion, séparation et alignement, ainsi que d'autres comportements tels que la fuite d'un prédateur et l'évitement des obstacles.
+The **Bande Organisée** project is an implementation of a simulation algorithm for group behaviors of animals, known as "boids," developed by Craig Reynolds in 1986. This program simulates a group of agents (boids) that interact with each other according to simple rules of cohesion, separation, and alignment, as well as other behaviors such as fleeing from a predator and avoiding obstacles.
 
-Voir plus sur les boids : https://fr.wikipedia.org/wiki/Boids
+Learn more about boids: https://en.wikipedia.org/wiki/Boids
 
-## Fonctionnalités
+## Features
 
-- Création de boids de différentes espèces.
-- Gestion des paramètres de chaque espèce.
-- Comportements de boids basés sur :
-  - **Cohésion** : les boids se dirigent vers le centre de leurs voisins.
-  - **Séparation** : les boids évitent de se rapprocher trop les uns des autres.
-  - **Alignement** : les boids s'alignent avec la direction moyenne de leurs voisins.
-  - **Chasse/Fuite** : les prédateurs poursuivent les proies tandis que celles-ci tentent de fuir.
-  - **Évitement d'obstacles** : les boids évitent les obstacles dans leur environnement.
-- Affichage des trajets laissés par les boids pour visualiser leurs mouvements.
-- Visualisation du champ de vision des boids avec un angle mort.
-- Ajout d'obstacles de tailles variables
+- Creation of boids of different species.
+- Management of parameters for each species.
+- Boid behaviors based on:
+  - **Cohesion**: boids move towards the center of their neighbors.
+  - **Separation**: boids avoid getting too close to each other.
+  - **Alignment**: boids align with the average direction of their neighbors.
+  - **Hunting/Fleeing**: predators chase prey while the prey attempts to escape.
+  - **Obstacle avoidance**: boids avoid obstacles in their environment.
+- Visualization of the trails left by the boids to show their movements.
+- Display of the boids' field of vision with a blind spot.
+- Addition of obstacles of varying sizes.
 
-## Prérequis
+## Prerequisites
 
-- Java Development Kit (JDK) 8 ou supérieur
-- Un environnement de développement intégré (IDE) tel qu'Eclipse, IntelliJ IDEA ou NetBeans.
+- Java Development Kit (JDK) 8 or higher
+- An Integrated Development Environment (IDE) such as Eclipse, IntelliJ IDEA, or NetBeans.
 
-## Fichiers
+## Files
 
 - **App.java**
-	> Classe principale.
+	> Main class.
 - **AppView.java**
-	> JFrame. Fenêtre principale de l'application.
+	> JFrame. Main window of the application.
 - **Boid.java**
-	> Un boid représente un individu d'une espèce (flock).
-	Il se déplace d'après des règles lui appliquant des forces en fonction des autres boids.
+	> A boid represents an individual of a species (flock). It moves according to rules that apply forces based on other boids.
 - **Colors.java**
-	> Énumération. Contient les différentes couleurs utilisables pour les boids et les obstacles.
+	> Enumeration. Contains the different colors usable for the boids and obstacles.
 - **ControlsView.java**
-	> JPanel. Affichage du panneau de contrôle.
+	> JPanel. Display of the control panel.
 - **Flock.java**
-	> Nuée. Représente une espèce unique comportant des boids.
+	> Flock. Represents a unique species consisting of boids.
 - **Obstacle.java**
-	> Obstacle circulaire pouvant bloquer le déplacement de boids.
+	> Circular obstacle that can block the movement of boids.
 - **SimulationView.java**
-	> JPanel. Affichage de la simulation.
+	> JPanel. Display of the simulation.
 - **Vector2D.java**
-	> Classe permettant de manipuler des vecteurs à 2 dimensions.
+	> Class for manipulating 2D vectors.
 
 ## Installation
 
-1. Clonez le dépôt GitHub :
+1. Clone the GitHub repository:
 
    ```bash
    git clone https://github.com/swan-maillard/INSA-2A-BandeOriganisee.git
    ```
 
-2. Accédez au répertoire du projet :
+2. Navigate to the project directory:
 
    ```bash
    cd INSA-2A-BandeOriganisee
    ```
 
-3. Ouvrez le projet dans votre IDE préféré.
+3. Open the project in your preferred IDE.
 
-4. Compilez et exécutez le projet via la méthode main de la classe App. Assurez-vous que les bibliothèques nécessaires sont ajoutées à votre classpath.
+4. Compile and run the project via the main method of the App class. Ensure that the necessary libraries are added to your classpath.
 
+## Usage
 
-## Utilisation
+1. Launch the application. A window will open showing the simulation of the boids.
+2. You can create different species of boids (max. 5 species) and modify their numbers (max. 100 boids per species), their behaviors (predator or prey), and other parameters through the user interface.
+3. You can add obstacles.
 
-1. Lancez l'application. Une fenêtre s'ouvrira montrant la simulation des boids.
-2. Vous pouvez créer différentes d'espèces de boids (max. 5 espèces) et modifier leurs nombres (max. 100 boids par espèce), leurs comportements (prédateur ou proie), et d'autres paramètres via l'interface utilisateur.
-3. Vous pouvez rajouter des obstacles.
-
-
-## Auteurs
+## Authors
 
 - Swan Maillard (maillard.swan@gmail.com)
 - Adam Laalouj (adam.laalouj@insa-lyon.fr)
 - Vincent Sename (vincent.sename@insa-lyon.fr)
 - Imad Touil (imad.touil@insa-lyon.fr)
 
-## Licence
+## License
 
-Ce projet est sous licence MIT. Veuillez consulter le fichier `LICENSE` pour plus d'informations.
+This project is licensed under the MIT License. Please consult the `LICENSE` file for more information.
